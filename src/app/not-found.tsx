@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function NotFound() { return <main className="mx-auto max-w-md px-6 py-20"><h1 className="text-2xl font-semibold">Workspace unavailable.</h1><p className="my-4 text-sm text-muted-foreground">This page is unavailable or your account doesn’t have access.</p><Link href="/organizations" className="text-sm font-medium text-primary">Return to workspaces →</Link></main>; }
