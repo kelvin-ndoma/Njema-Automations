@@ -1,16 +1,53 @@
 import 'server-only';
 import mongoose, { Schema, type InferSchemaType, type Model } from 'mongoose';
 import { roles } from './policy';
-const organizationSchema = new Schema({ name: { type: String, required: true }, slug: { type: String, required: true }, currency: { type: String, required: true }, timeZone: { type: String, required: true }, locale: { type: String, required: true } }, { timestamps: true });
+const organizationSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    slug: { type: String, required: true },
+    currency: { type: String, required: true },
+    timeZone: { type: String, required: true },
+    locale: { type: String, required: true },
+  },
+  { timestamps: true },
+);
 organizationSchema.index({ slug: 1 }, { unique: true });
-const membershipSchema = new Schema({ organizationId: { type: Schema.Types.ObjectId, required: true }, userId: { type: String, required: true }, role: { type: String, enum: roles, required: true }, status: { type: String, enum: ['active', 'revoked'], default: 'active', required: true } }, { timestamps: true });
+const membershipSchema = new Schema(
+  {
+    organizationId: { type: Schema.Types.ObjectId, required: true },
+    userId: { type: String, required: true },
+    role: { type: String, enum: roles, required: true },
+    status: { type: String, enum: ['active', 'revoked'], default: 'active', required: true },
+  },
+  { timestamps: true },
+);
 membershipSchema.index({ organizationId: 1, userId: 1 }, { unique: true });
 membershipSchema.index({ userId: 1, status: 1 });
-const auditSchema = new Schema({ organizationId: { type: Schema.Types.ObjectId, required: true }, actorId: { type: String, required: true }, action: { type: String, required: true }, resourceId: { type: String, required: true } }, { timestamps: { createdAt: true, updatedAt: false } });
+const auditSchema = new Schema(
+  {
+    organizationId: { type: Schema.Types.ObjectId, required: true },
+    actorId: { type: String, required: true },
+    action: { type: String, required: true },
+    resourceId: { type: String, required: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+);
 auditSchema.index({ organizationId: 1, createdAt: -1 });
-const limitSchema = new Schema({ _id: { type: String, required: true }, count: { type: Number, default: 0 }, expiresAt: Date });
+const limitSchema = new Schema({
+  _id: { type: String, required: true },
+  count: { type: Number, default: 0 },
+  expiresAt: Date,
+});
 limitSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-export const Organization: Model<InferSchemaType<typeof organizationSchema>> = (mongoose.models.Organization as Model<InferSchemaType<typeof organizationSchema>> | undefined) || mongoose.model<InferSchemaType<typeof organizationSchema>>('Organization', organizationSchema);
-export const Membership: Model<InferSchemaType<typeof membershipSchema>> = (mongoose.models.Membership as Model<InferSchemaType<typeof membershipSchema>> | undefined) || mongoose.model<InferSchemaType<typeof membershipSchema>>('Membership', membershipSchema);
-export const AuditEvent: Model<InferSchemaType<typeof auditSchema>> = (mongoose.models.AuditEvent as Model<InferSchemaType<typeof auditSchema>> | undefined) || mongoose.model<InferSchemaType<typeof auditSchema>>('AuditEvent', auditSchema);
-export const MutationLimit: Model<InferSchemaType<typeof limitSchema>> = (mongoose.models.MutationLimit as Model<InferSchemaType<typeof limitSchema>> | undefined) || mongoose.model<InferSchemaType<typeof limitSchema>>('MutationLimit', limitSchema);
+export const Organization: Model<InferSchemaType<typeof organizationSchema>> =
+  (mongoose.models.Organization as Model<InferSchemaType<typeof organizationSchema>> | undefined) ||
+  mongoose.model<InferSchemaType<typeof organizationSchema>>('Organization', organizationSchema);
+export const Membership: Model<InferSchemaType<typeof membershipSchema>> =
+  (mongoose.models.Membership as Model<InferSchemaType<typeof membershipSchema>> | undefined) ||
+  mongoose.model<InferSchemaType<typeof membershipSchema>>('Membership', membershipSchema);
+export const AuditEvent: Model<InferSchemaType<typeof auditSchema>> =
+  (mongoose.models.AuditEvent as Model<InferSchemaType<typeof auditSchema>> | undefined) ||
+  mongoose.model<InferSchemaType<typeof auditSchema>>('AuditEvent', auditSchema);
+export const MutationLimit: Model<InferSchemaType<typeof limitSchema>> =
+  (mongoose.models.MutationLimit as Model<InferSchemaType<typeof limitSchema>> | undefined) ||
+  mongoose.model<InferSchemaType<typeof limitSchema>>('MutationLimit', limitSchema);

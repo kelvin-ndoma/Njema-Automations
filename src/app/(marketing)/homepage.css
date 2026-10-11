@@ -1,0 +1,1017 @@
+/* Homepage composition is scoped; authentication and workspace styles are untouched. */
+.marketing:has(.relay-home) .marketing-header {
+  background: #103b31;
+  color: #f6f4ed;
+  border-color: #ffffff20;
+  backdrop-filter: none;
+}
+.marketing:has(.relay-home) .marketing-header .marketing-logo {
+  color: #f6f4ed;
+}
+.marketing:has(.relay-home) .marketing-header .logo-mark {
+  color: #103b31;
+  background: #dceaaf;
+}
+.marketing:has(.relay-home) .marketing-header .logo-dot {
+  color: #dceaaf;
+}
+.marketing:has(.relay-home) .marketing-header nav a:hover {
+  color: #dceaaf;
+}
+.marketing:has(.relay-home) .marketing-header .marketing-button {
+  color: #103b31;
+  background: #dceaaf;
+}
+.marketing:has(.relay-home) .nav-inner {
+  width: min(1600px, calc(100% - 64px));
+  height: 74px;
+}
+.marketing:has(.relay-home) .mobile-marketing-toggle {
+  border-color: #ffffff55;
+}
+.marketing:has(.relay-home) .mobile-marketing-menu {
+  background: #103b31;
+  border-color: #ffffff20;
+}
+.relay-home .marketing-container {
+  width: min(1600px, calc(100% - 64px));
+}
+.relay-home .hero-stage {
+  position: relative;
+  background: #103b31;
+  color: #f6f4ed;
+  isolation: isolate;
+  overflow: clip;
+}
+.relay-home .hero-stage::before {
+  content: '';
+  position: absolute;
+  width: 620px;
+  height: 620px;
+  border: 1px solid #ffffff0b;
+  border-radius: 50%;
+  right: -210px;
+  top: -180px;
+  z-index: -1;
+}
+.relay-home .hero-stage::after {
+  content: '';
+  position: absolute;
+  height: 1px;
+  background: #ffffff0d;
+  width: 90%;
+  rotate: -28deg;
+  top: 60%;
+  right: -30%;
+  z-index: -1;
+}
+.relay-home .marketing-hero {
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  gap: 38px;
+  padding-block: 42px 45px;
+}
+.relay-home .hero-copy {
+  max-width: 600px;
+}
+.relay-home .hero-kicker {
+  color: #dceaaf;
+  margin-bottom: 22px !important;
+  font-size: 11px !important;
+}
+.relay-home .hero-kicker > span {
+  background: #dceaaf;
+}
+.relay-home h1 {
+  font-size: clamp(40px, 3.75vw, 62px);
+  line-height: 1.09;
+  letter-spacing: -0.048em;
+}
+.relay-home h1 em {
+  color: #dceaaf;
+}
+.relay-home .hero-description {
+  max-width: 490px;
+  font-size: 14px;
+  color: #d0ddd4;
+  margin-top: 22px !important;
+}
+.relay-home .hero-copy .cta-row {
+  margin-top: 24px;
+  gap: 20px;
+}
+.relay-home .hero-copy .marketing-button {
+  background: #dceaaf;
+  color: #103b31;
+  border-radius: 6px;
+  min-height: 49px;
+}
+.relay-home .hero-copy .marketing-button:hover {
+  background: #edf4d5;
+}
+.relay-home .hero-copy .text-link {
+  color: #f6f4ed;
+}
+.relay-home .hero-availability {
+  color: #c4d7c9;
+  font-size: 10px !important;
+  line-height: 1.7;
+  max-width: 460px;
+}
+.relay-home .hero-availability > span {
+  background: #dceaaf;
+  flex-shrink: 0;
+}
+.relay-home .hero-visual {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+.relay-home .visual-note {
+  margin: 0 0 13px;
+  color: #d4e2d6;
+}
+.relay-home .visual-note .eyebrow {
+  max-width: none;
+  font-size: 9px;
+}
+.relay-home .visual-note > svg {
+  width: 18px;
+  height: 18px;
+}
+.relay-home .visual-bottom {
+  color: #d4e2d6;
+  margin: 15px 0 0;
+  font-size: 12px;
+}
+.relay-home .visual-rule {
+  background: #ffffff30;
+}
+.relay-product.product-preview {
+  transform: none;
+  border: 1px solid #9ab9a980;
+  border-radius: 11px;
+  background: #fafbf7;
+  color: #173e34;
+  box-shadow: 0 22px 45px -18px #00000065;
+}
+.relay-product figcaption {
+  padding: 13px 17px;
+  gap: 8px;
+  background: #eef2e9;
+  color: #314e40;
+  font-size: 10px;
+}
+.relay-product figcaption > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+}
+.relay-product figcaption span.preview-caption-divider {
+  margin: 0 2px;
+  color: #52634c;
+  border: 0;
+  padding: 0;
+}
+.relay-product figcaption span.preview-disclaimer {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  color: #425d46;
+  font-size: 9px;
+}
+.relay-interface {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 185px;
+  min-height: 400px;
+}
+.interface-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  background: #163f34;
+  color: #d4e1d0;
+  padding: 17px 0;
+}
+.interface-rail .preview-symbol {
+  margin: 0 0 7px;
+  font-size: 24px;
+}
+.rail-selected {
+  padding: 8px;
+  background: #dceaaf;
+  color: #173e34;
+  border-radius: 5px;
+}
+.rail-user {
+  margin-top: auto;
+  padding: 7px;
+  border: 1px solid #ffffff45;
+  border-radius: 50%;
+}
+.interface-conversation {
+  padding: 20px 18px 14px;
+  min-width: 0;
+}
+.interface-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.interface-heading .eyebrow {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: #52694e;
+}
+.marketing .interface-heading h2 {
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin-top: 5px;
+  font-weight: 600;
+}
+.lead-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 1px solid #c9d9b8;
+  background: #eef4e2;
+  border-radius: 5px;
+  color: #3d602a;
+  font-size: 9px;
+  white-space: nowrap;
+}
+.lead-badge > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #51743b;
+}
+.conversation-person {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-block: 1px solid #e2e7dc;
+  margin: 15px 0;
+  padding: 10px 0;
+}
+.conversation-person .avatar {
+  width: 29px;
+  height: 29px;
+  font-size: 11px;
+}
+.conversation-person strong {
+  display: block;
+  font-size: 11px;
+}
+.conversation-person small {
+  display: block;
+  font-size: 9px;
+  color: #53664f;
+  margin-top: 2px;
+}
+.conversation-person > svg {
+  margin-left: auto;
+  color: #51694b;
+}
+.relay-product .chat-bubble {
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  border-radius: 7px;
+}
+.relay-product .chat-bubble.visitor {
+  background: #edefe8;
+  margin-left: 25px;
+  color: #344b3c;
+}
+.relay-product .chat-label {
+  margin-top: 17px;
+  margin-bottom: 7px;
+  font-size: 9px;
+  color: #3e5f34;
+  gap: 5px;
+}
+.chat-label > span {
+  margin-left: auto;
+  font-size: 8px;
+  color: #506247;
+}
+.relay-product .chat-bubble.employee {
+  background: #e5efd7;
+  border-color: #d1dfbf;
+  margin-right: 15px;
+}
+.relay-product .second-message {
+  margin-top: 13px;
+}
+.context-captured {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 9px;
+  color: #36562f;
+  padding-block: 12px 5px;
+}
+.illustration-label {
+  margin-left: auto;
+  font-size: 8px;
+  color: #566849;
+}
+.relay-product .preview-composer {
+  padding: 11px;
+  margin-top: 12px;
+  font-size: 10px;
+  color: #52674b;
+  background: #fff;
+  border-color: #d7e1cc;
+}
+.qualification-panel {
+  padding: 20px 13px 14px;
+  background: #f0f3eb;
+  border-left: 1px solid #dde4d5;
+  min-width: 0;
+}
+.qualification-title {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.marketing .qualification-title h3 {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.qualification-status {
+  margin-top: 22px;
+}
+.qualification-status .eyebrow {
+  display: block;
+  font-size: 8px;
+  color: #526649;
+  letter-spacing: 0.1em;
+}
+.qualification-status strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+.qualification-tag {
+  display: inline-block;
+  font-size: 8px;
+  color: #3f5b32;
+  border-bottom: 1px solid #bccaac;
+  padding-bottom: 5px;
+  margin-top: 6px;
+}
+.qualification-panel dl {
+  margin: 16px 0 20px;
+}
+.qualification-panel dl > div {
+  padding-block: 9px;
+  border-top: 1px solid #dce4d2;
+}
+.qualification-panel dt {
+  font-size: 9px;
+  color: #586b4e;
+  margin-bottom: 5px;
+}
+.qualification-panel dd {
+  display: flex;
+  gap: 4px;
+  align-items: start;
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+.qualification-panel dd svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.human-handoff {
+  padding: 12px;
+  border: 1px solid #cbd8bb;
+  background: #e7eedc;
+  border-radius: 6px;
+}
+.human-handoff .handoff-icon {
+  display: inline-flex;
+  padding: 6px;
+  background: #fff;
+  margin-bottom: 8px;
+  color: #3a5631;
+}
+.marketing .human-handoff h3 {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+.marketing .human-handoff p {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #455f39;
+}
+.handoff-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 8px;
+  margin-top: 12px;
+  color: #36572a;
+}
+.marketing .qualification-note {
+  font-size: 8px;
+  line-height: 1.5;
+  color: #4e6345;
+  margin-top: 12px;
+}
+.interface-workflow {
+  padding: 13px 17px;
+  border-top: 1px solid #dbe3d2;
+  background: #f6f8ef;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.workflow-caption {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4f6345;
+}
+.interface-workflow ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.interface-workflow li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+}
+.interface-workflow li > span {
+  width: 19px;
+  height: 19px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #bbcbaa;
+  border-radius: 50%;
+  font-size: 8px;
+}
+.workflow-complete {
+  background: #e0ebce;
+  color: #38552c;
+}
+.workflow-current {
+  background: #173e34;
+  color: #fff;
+}
+.interface-workflow strong {
+  font-weight: 500;
+}
+.interface-workflow li > svg {
+  color: #5f7353;
+  margin-left: 6px;
+}
+.relay-home .brand-principles {
+  padding-block: 20px;
+  border-top: 0;
+}
+.relay-home .pain-section {
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 50px;
+  padding-block: 55px;
+}
+.relay-home .pain-items {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.relay-home .pain-item {
+  flex-direction: column;
+  gap: 12px;
+}
+.relay-home .pain-item h3 {
+  font-size: 16px;
+  line-height: 1.35;
+}
+.relay-home .pain-item p {
+  font-size: 12px;
+  margin-top: 9px;
+}
+.relay-home h2 {
+  font-size: clamp(30px, 3vw, 44px);
+}
+.relay-home .how-section {
+  padding-block: 48px;
+  background: #e5ecdb;
+}
+.relay-home .section-heading {
+  gap: 30px;
+}
+.relay-home .how-steps {
+  gap: 30px;
+  margin-top: 28px;
+}
+.relay-home .how-steps article {
+  position: relative;
+  padding-left: 42px;
+}
+.relay-home .step-number {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 26px;
+}
+.relay-home .how-steps h3 {
+  margin-top: 0;
+  font-size: 17px;
+}
+.relay-home .how-steps p {
+  max-width: none;
+  font-size: 12px;
+}
+.relay-home .step-status {
+  margin-top: 12px;
+}
+.relay-home .workflow-section {
+  padding: 24px 28px;
+  border-radius: 6px;
+  background: #163f34;
+  color: #f6f4ed;
+  margin-top: 30px;
+}
+.relay-home .workflow-section > div {
+  gap: 10px 30px;
+}
+.relay-home .workflow-section .eyebrow {
+  color: #dceaaf;
+  flex-basis: auto;
+}
+.relay-home .workflow-section h2 {
+  font-size: 24px;
+}
+.relay-home .workflow-section .section-aside {
+  font-size: 12px;
+  color: #d4e0d0;
+}
+.relay-home .workflow-track {
+  margin-top: 22px;
+}
+.relay-home .workflow-track h3 {
+  color: #f6f4ed;
+}
+.relay-home .workflow-track p {
+  color: #cddac6;
+}
+.relay-home .workflow-node {
+  color: #173e34;
+}
+.relay-home .workflow-arrow {
+  color: #d4e0c1;
+}
+.relay-home .capabilities-section {
+  padding-block: 50px;
+}
+.relay-home .capability-grid {
+  margin-top: 28px;
+}
+.relay-home .capability-grid article {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.relay-home .capability-index {
+  margin-bottom: 19px;
+}
+.relay-home .industry-section {
+  margin-top: 0;
+  padding-block: 50px;
+  background: #1b4539;
+}
+.relay-home .industry-layout {
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 60px;
+}
+.relay-home .industry-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+}
+.relay-home .industry-list a:first-child {
+  padding-top: 20px;
+}
+.relay-home .industry-list a {
+  padding-block: 20px;
+}
+.relay-home .industry-list h3 {
+  font-size: 16px;
+}
+.relay-home .industry-list p {
+  line-height: 1.65;
+}
+.relay-home .benefits-section {
+  padding-block: 45px;
+  display: grid;
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 45px;
+}
+.relay-home .benefits-section > .eyebrow {
+  grid-column: 1/-1;
+}
+.relay-home .benefits-section > h2 {
+  font-size: 29px;
+  margin: 0;
+}
+.relay-home .benefit-columns {
+  gap: 25px;
+  margin: 0;
+}
+.relay-home .benefit-columns h3 {
+  font-size: 15px;
+  margin-top: 12px;
+}
+.relay-home .benefit-columns p {
+  font-size: 11px;
+}
+.relay-home .faq-section {
+  padding-block: 38px;
+  gap: 45px;
+  grid-template-columns: 0.65fr 1.35fr;
+}
+.relay-home .faq-section summary {
+  padding-block: 16px;
+}
+.relay-home .final-cta {
+  border-radius: 8px;
+  padding: 35px 40px;
+  margin-bottom: 38px;
+  text-align: left;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px 32px;
+  background: #dce9bb;
+}
+.relay-home .final-cta > .eyebrow {
+  grid-column: 1/-1;
+}
+.relay-home .final-cta h2 {
+  margin: 0;
+  font-size: 38px;
+}
+.relay-home .final-cta .cta-row {
+  margin: 0;
+  align-content: center;
+  justify-content: flex-start;
+  max-width: 320px;
+  gap: 12px;
+}
+.relay-home .final-cta .fine-print {
+  grid-column: 1/-1;
+  margin: 0;
+}
+@media (max-width: 1200px) {
+  .relay-home .marketing-hero {
+    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+    gap: 25px;
+  }
+  .relay-home h1 {
+    font-size: 42px;
+  }
+  .relay-interface {
+    grid-template-columns: 36px minmax(0, 1fr) 160px;
+  }
+  .qualification-panel {
+    padding-inline: 10px;
+  }
+  .interface-conversation {
+    padding-inline: 13px;
+  }
+  .relay-product figcaption {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .relay-product figcaption span.preview-disclaimer {
+    font-size: 8px;
+  }
+  .relay-home .pain-section {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .relay-home .pain-items {
+    gap: 35px;
+  }
+  .relay-home .benefits-section {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .relay-home .benefit-columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 950px) {
+  .relay-home .marketing-hero {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding-block: 32px 35px;
+  }
+  .relay-home .hero-copy {
+    max-width: 720px;
+  }
+  .relay-home h1 {
+    font-size: clamp(38px, 5.5vw, 50px);
+  }
+  .relay-home .hero-description {
+    max-width: 590px;
+  }
+  .relay-home .hero-visual {
+    max-width: 850px;
+  }
+  .relay-interface {
+    grid-template-columns: 44px minmax(0, 1fr) 205px;
+  }
+  .relay-home .industry-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .relay-home .industry-layout h2 br {
+    display: none;
+  }
+  .relay-home .industry-layout h2 em {
+    margin-left: 8px;
+  }
+  .relay-home .industry-layout > div:first-child > p:not(.eyebrow) {
+    max-width: 650px;
+  }
+  .relay-home .industry-list {
+    gap: 0 35px;
+  }
+}
+@media (max-width: 600px) {
+  .relay-home .marketing-container,
+  .marketing:has(.relay-home) .nav-inner {
+    width: calc(100% - 36px);
+  }
+  .marketing:has(.relay-home) .nav-inner {
+    height: 65px;
+  }
+  .relay-home .marketing-hero {
+    padding-block: 25px 28px;
+    gap: 24px;
+  }
+  .relay-home h1 {
+    font-size: clamp(29px, 8.6vw, 37px);
+  }
+  .relay-home .hero-kicker {
+    margin-bottom: 16px !important;
+    font-size: 10px !important;
+  }
+  .relay-home .hero-description {
+    font-size: 13px;
+    margin-top: 18px !important;
+  }
+  .relay-home .hero-copy .cta-row {
+    gap: 16px;
+    margin-top: 19px;
+  }
+  .relay-home .hero-availability {
+    font-size: 9px !important;
+    max-width: none;
+  }
+  .relay-home .visual-note .eyebrow {
+    font-size: 8px;
+  }
+  .relay-home .visual-bottom {
+    font-size: 11px;
+  }
+  .relay-product figcaption {
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+  .relay-product figcaption span.preview-disclaimer {
+    margin-left: 0;
+    flex-basis: 100%;
+    font-size: 8px;
+  }
+  .relay-interface {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .interface-rail {
+    gap: 25px;
+    padding-top: 15px;
+  }
+  .interface-rail > svg {
+    width: 14px;
+  }
+  .rail-selected {
+    padding: 4px;
+  }
+  .rail-selected svg {
+    width: 15px;
+  }
+  .interface-conversation {
+    padding: 15px 12px;
+  }
+  .interface-heading {
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .marketing .interface-heading h2 {
+    font-size: 12px;
+  }
+  .lead-badge {
+    font-size: 8px;
+    padding: 3px 5px;
+  }
+  .relay-product .chat-bubble {
+    font-size: 11px;
+    padding: 10px 11px;
+  }
+  .relay-product .chat-bubble.visitor {
+    margin-left: 14px;
+  }
+  .relay-product .chat-bubble.employee {
+    margin-right: 7px;
+  }
+  .relay-product .chat-label {
+    font-size: 8px;
+  }
+  .qualification-panel {
+    grid-column: 1/-1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    padding: 15px;
+    border-left: 0;
+    border-top: 1px solid #d6e0ca;
+  }
+  .qualification-title {
+    grid-column: 1/-1;
+  }
+  .qualification-status {
+    margin: 0;
+  }
+  .qualification-panel dl {
+    margin: 0;
+    grid-column: 1;
+  }
+  .qualification-panel dl > div {
+    padding-block: 7px;
+  }
+  .human-handoff {
+    grid-column: 2;
+    grid-row: 2/4;
+    align-self: start;
+  }
+  .qualification-note {
+    grid-column: 1/-1;
+    margin-top: 0 !important;
+  }
+  .interface-workflow {
+    flex-direction: column;
+    align-items: start;
+    gap: 9px;
+    padding: 12px;
+  }
+  .interface-workflow ol {
+    width: 100%;
+    gap: 4px;
+  }
+  .interface-workflow li {
+    font-size: 8px;
+    gap: 3px;
+  }
+  .interface-workflow li > svg {
+    margin-left: 1px;
+    width: 10px;
+  }
+  .interface-workflow li > span {
+    width: 16px;
+    height: 16px;
+  }
+  .relay-home .brand-principles {
+    gap: 14px 10px;
+    padding-block: 17px;
+  }
+  .relay-home .pain-section {
+    padding-block: 35px;
+    gap: 24px;
+  }
+  .relay-home .pain-items {
+    grid-template-columns: 1fr;
+    gap: 19px;
+  }
+  .relay-home .pain-item {
+    flex-direction: row;
+    gap: 12px;
+  }
+  .relay-home .pain-item > svg {
+    margin-top: 2px;
+  }
+  .relay-home .pain-item p {
+    font-size: 12px;
+  }
+  .relay-home h2 {
+    font-size: 30px;
+  }
+  .relay-home .how-section {
+    padding-block: 35px;
+  }
+  .relay-home .how-steps {
+    gap: 24px;
+    margin-top: 25px;
+  }
+  .relay-home .how-steps article {
+    padding-left: 39px;
+  }
+  .relay-home .workflow-section {
+    padding: 22px 18px;
+    margin-top: 25px;
+  }
+  .relay-home .workflow-section > div {
+    flex-direction: column;
+    align-items: start;
+  }
+  .relay-home .workflow-section h2 {
+    font-size: 24px;
+  }
+  .relay-home .workflow-track {
+    gap: 16px;
+  }
+  .relay-home .capabilities-section {
+    padding-block: 35px;
+  }
+  .relay-home .capability-grid h3 {
+    font-size: 16px;
+  }
+  .relay-home .capability-grid h3 + p {
+    font-size: 12px;
+  }
+  .relay-home .capability-index {
+    margin-bottom: 15px;
+  }
+  .relay-home .industry-section {
+    padding-block: 35px;
+  }
+  .relay-home .industry-layout h2 br {
+    display: initial;
+  }
+  .relay-home .industry-layout h2 em {
+    margin-left: 0;
+  }
+  .relay-home .industry-list {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .relay-home .industry-list a {
+    padding-block: 16px;
+  }
+  .relay-home .benefits-section {
+    padding-block: 35px;
+    gap: 20px;
+  }
+  .relay-home .benefit-columns {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  .relay-home .benefit-columns h3 {
+    margin-top: 0;
+    font-size: 16px;
+  }
+  .relay-home .benefit-columns p {
+    font-size: 12px;
+  }
+  .relay-home .faq-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-block: 30px;
+  }
+  .relay-home .final-cta {
+    grid-template-columns: 1fr;
+    padding: 27px 23px;
+    gap: 19px;
+    margin-bottom: 30px;
+  }
+  .relay-home .final-cta h2 {
+    font-size: 30px;
+  }
+  .relay-home .final-cta .cta-row {
+    max-width: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .relay-home *,
+  .relay-home *::before,
+  .relay-home *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

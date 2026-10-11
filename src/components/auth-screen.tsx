@@ -1,7 +1,59 @@
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { Brand } from './brand';
 import { AuthForm } from './auth-form';
-export function AuthScreen({ signup = false }: { signup?: boolean }) { return <main className="grid min-h-screen lg:grid-cols-[1fr_1fr]">
- <section className="relative hidden flex-col justify-between overflow-hidden bg-[#143d36] p-12 text-white lg:flex"><Brand /><div className="relative z-10 max-w-lg"><p className="mb-5 text-xs uppercase tracking-[.22em] text-emerald-200">Your next chapter in sales</p><h1 className="text-5xl leading-[1.12] font-medium tracking-tight">Good conversations.<br />Greater possibilities.</h1><p className="mt-6 max-w-sm text-base leading-7 text-emerald-100/75">An intelligent AI sales workforce for modern businesses. Build your workspace, then shape what comes next.</p><div className="mt-10 flex items-center gap-3 text-sm text-emerald-100"><ArrowUpRight size={20} /> Capture opportunities. Convert more leads.</div></div><p className="text-xs text-emerald-100/60">Built around your business. Ready for a global team.</p><div aria-hidden="true" className="absolute -right-40 top-1/3 size-96 rounded-full border border-white/10" /></section>
- <section className="flex flex-col px-6 py-8 sm:px-12"><div className="lg:hidden"><Brand /></div><div className="m-auto w-full max-w-sm py-12"><p className="mb-3 text-xs font-semibold uppercase tracking-[.18em] text-primary">{signup ? 'Start with a workspace' : 'Welcome back'}</p><h2 className="text-3xl font-semibold tracking-tight">{signup ? 'Make room for growth.' : 'Your workspace awaits.'}</h2><p className="mb-8 mt-3 text-sm leading-6 text-muted-foreground">{signup ? 'Create your account to set up your business workspace.' : 'Sign in to continue building your sales workspace.'}</p><AuthForm signup={signup} /><p className="mt-8 flex justify-center gap-2 text-xs text-muted-foreground"><ShieldCheck size={14} /> Secure sessions. Private workspaces.</p></div><p className="text-center text-xs text-muted-foreground">Relay · AI sales workforce</p></section>
- </main>; }
+export function AuthScreen({ signup = false, next }: { signup?: boolean; next?: string }) {
+  return (
+    <main className="grid min-h-screen lg:grid-cols-[1fr_1fr]">
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-[#143d36] p-12 text-white lg:flex">
+        <Brand />
+        <div className="relative z-10 max-w-lg">
+          <p className="mb-5 text-xs uppercase tracking-[.22em] text-emerald-200">
+            Your next chapter in sales
+          </p>
+          <h1 className="text-5xl leading-[1.12] font-medium tracking-tight">
+            Good conversations.
+            <br />
+            Greater possibilities.
+          </h1>
+          <p className="mt-6 max-w-sm text-base leading-7 text-emerald-100/75">
+            An intelligent AI sales workforce for modern businesses. Build your workspace, then
+            shape what comes next.
+          </p>
+          <div className="mt-10 flex items-center gap-3 text-sm text-emerald-100">
+            <ArrowUpRight size={20} /> Capture opportunities. Convert more leads.
+          </div>
+        </div>
+        <p className="text-xs text-emerald-100/60">
+          Built around your business. Ready for a global team.
+        </p>
+        <div
+          aria-hidden="true"
+          className="absolute -right-40 top-1/3 size-96 rounded-full border border-white/10"
+        />
+      </section>
+      <section className="flex flex-col px-6 py-8 sm:px-12">
+        <div className="lg:hidden">
+          <Brand />
+        </div>
+        <div className="m-auto w-full max-w-sm py-12">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[.18em] text-primary">
+            {signup ? 'Start with a workspace' : 'Welcome back'}
+          </p>
+          <h2 className="text-3xl font-semibold tracking-tight">
+            {signup ? 'Make room for growth.' : 'Your workspace awaits.'}
+          </h2>
+          <p className="mb-8 mt-3 text-sm leading-6 text-muted-foreground">
+            {signup
+              ? 'Create your account to set up your business workspace.'
+              : 'Sign in to continue building your sales workspace.'}
+          </p>
+          <AuthForm signup={signup} next={next} />
+          <p className="mt-8 flex justify-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck size={14} /> Secure sessions. Private workspaces.
+          </p>
+        </div>
+        <p className="text-center text-xs text-muted-foreground">Relay · AI sales workforce</p>
+      </section>
+    </main>
+  );
+}

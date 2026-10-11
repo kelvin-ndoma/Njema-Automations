@@ -1,2 +1,4 @@
 import { AuthScreen } from '@/components/auth-screen';
-export default function Page() { return <AuthScreen signup />; }
+export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
+  return <AuthScreen signup next={(await searchParams).next} />;
+}

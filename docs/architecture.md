@@ -50,5 +50,48 @@ Data pages and actions independently authenticate; the layout is not the only gu
 
 Onboarding/settings/team → employees/knowledge/AI → website chat/conversations →
 CRM/qualification/pipelines → quotations/scheduling/follow-ups → analytics/usage/
-billing/platform administration → other channel integrations. All remain unimplemented.
+billing/advanced platform operations → other channel integrations. These modules remain unimplemented.
 Provider abstractions and durable jobs will be selected in their relevant milestones.
+
+## Platform reporting (Milestones 1–2)
+
+`/platform`, `/platform/organizations`, `/platform/organizations/[id]`,
+`/platform/users`, `/platform/users/[id]` are implemented with a dedicated protected
+shell. The singleton `platformRoles` grant is checked against the current database
+session user ID. Organization roles are independent; no tenant-service bypass exists.
+
+Every exported operation in `src/modules/platform/read-repository.ts` calls the
+super-admin guard before accessing data, independently of layouts. Reporting uses
+the native MongoDB driver to join Mongoose-owned organization/membership records
+with Better Auth-owned identities. Domain writes remain in their existing services.
+Projection allowlists and explicit DTOs exclude account credentials, tokens, private
+notes and customer content. Native auth ObjectIds and string membership user IDs
+are normalized only for identity joins. No browser roles are trusted.
+
+Directories paginate 15 records with stable creation-date/ID ordering, bounded
+search input and literal escaped regex search. Membership detail views paginate too.
+Search is suitable for the initial dataset; dedicated search indexes and cursor
+pagination can replace substring search/offset pagination as the dataset grows.
+
+Overview totals are all-time counts; new organizations and growth use the selected
+7/30/90 UTC calendar-day window through page load. Missing dates are not guessed.
+Absent lifecycle status is explicitly unavailable, never treated as active. Latest
+organizations and audit activity are all-time latest records. Independent database
+reads are not a transactional reporting snapshot and can differ during concurrent writes.
+Platform pages are dynamic, private/no-store and excluded from indexing.
+
+Shared UI includes responsive platform navigation, compact tables, pagination,
+search/status filters, badges, accessible Radix dialogs, UTC date formatting and
+Recharts growth with a daily-count table alternative. The test runner uses a separate
+build directory and loopback port 3100; fixtures exist only in disposable test databases.
+
+## Public marketing surface
+
+`src/app/(marketing)` is a public route group with independent navigation, footer,
+scoped design styles and metadata. `/` renders public content for every visitor and
+has no authentication or database dependency. `/auth/continue` remains the server-side
+post-login destination resolver. Private layouts and repositories retain authorization.
+
+`src/modules/marketing` owns public inquiry validation, rate-limited submission and
+transactional persistence plus audit metadata. Inquiry records have no public read API.
+See [the marketing decision](decisions/004-public-marketing-site.md).

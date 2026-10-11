@@ -1,19 +1,36 @@
 import { connectDb, authClient } from '../src/server/db';
-import { Organization, Membership, AuditEvent, MutationLimit } from '../src/modules/organizations/models';
+import {
+  Organization,
+  Membership,
+  AuditEvent,
+  MutationLimit,
+} from '../src/modules/organizations/models';
 import { getEnv } from '../src/server/env';
 async function main() {
- const db = await connectDb();
- try {
-  await Promise.all([Organization.createIndexes(), Membership.createIndexes(), AuditEvent.createIndexes(), MutationLimit.createIndexes()]);
-  const client = authClient(); const authDb = client.db(getEnv().MONGODB_DB);
-  await Promise.all([
-   authDb.collection('user').createIndex({ email: 1 }, { unique: true }),
-   authDb.collection('session').createIndex({ token: 1 }, { unique: true }),
-   authDb.collection('session').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
-   authDb.collection('account').createIndex({ providerId: 1, accountId: 1 }, { unique: true }),
-   authDb.collection('rateLimit').createIndex({ key: 1 }, { unique: true }),
-  ]);
-  console.log('Database indexes created.'); await client.close();
- } finally { await db.disconnect(); }
+  const db = await connectDb();
+  try {
+    await Promise.all([
+      Organization.createIndexes(),
+      Membership.createIndexes(),
+      AuditEvent.createIndexes(),
+      MutationLimit.createIndexes(),
+    ]);
+    const client = authClient();
+    const authDb = client.db(getEnv().MONGODB_DB);
+    await Promise.all([
+      authDb.collection('user').createIndex({ email: 1 }, { unique: true }),
+      authDb.collection('session').createIndex({ token: 1 }, { unique: true }),
+      authDb.collection('session').createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
+      authDb.collection('account').createIndex({ providerId: 1, accountId: 1 }, { unique: true }),
+      authDb.collection('rateLimit').createIndex({ key: 1 }, { unique: true }),
+    ]);
+    console.log('Database indexes created.');
+    await client.close();
+  } finally {
+    await db.disconnect();
+  }
 }
-main().catch(() => { console.error('Index setup failed. Verify database configuration and replica-set access.'); process.exitCode = 1; });
+main().catch(() => {
+  console.error('Index setup failed. Verify database configuration and replica-set access.');
+  process.exitCode = 1;
+});

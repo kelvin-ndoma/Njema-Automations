@@ -6,15 +6,17 @@ Better Auth owns password hashing, signed cookies, session creation and invalida
 Passwords require 12–128 characters. Sessions expire after seven days and refresh
 at most daily. Cookie caching is disabled: session state is checked in MongoDB.
 Production cookies are secure; local HTTP development uses HTTP-only, SameSite cookies.
-Auth POSTs require the exact configured Origin. Better Auth's own origin/CSRF checks
+Auth POSTs require the configured origin. For a loopback configuration only, the
+exact `localhost` and `127.0.0.1` aliases are allowed with the same protocol and port.
+Public deployment origins remain exact; no wildcard origins are allowed. Better Auth's own origin/CSRF checks
 remain enabled. Next.js enforces Server Action origin checks. No custom session protocol.
 
 ## Tenant authorization
 
 Roles: owner/admin may read the workspace, update organization settings and manage
 members; manager/agent/viewer may read. Update/team permissions are defined for later
-milestones, with no update/team endpoints in Phase 1. Platform administrator permissions
-are not organization roles and will require a separate protected system in Phase 7.
+milestones, with no update/team endpoints in Phase 1. Platform access is governed by a separate singleton grant and guard; organization
+roles never grant platform privileges.
 Every workspace read/switch checks active membership from the database. Unknown,
 foreign and revoked workspaces disclose the same unavailable message. Client-selected
 organization IDs, slugs and preference cookies never establish authority.
@@ -53,3 +55,49 @@ advisory through Next's ESLint plugin. Registry latest braces is 3.0.3, still af
 no compatible patched version was offered during setup. Do not blindly downgrade Next
 or force an audit fix. Runtime dependency audit is checked separately. Lint only trusted
 repository content until upstream resolves the advisory.
+
+## Explicit super-admin seed
+
+The owner-requested bootstrap email is `kelvinndomamutua@gmail.com`. The terminal-only
+seed command creates the account through Better Auth if needed, with a privately
+entered password, and transactionally creates a singleton `platformRoles` grant and
+identity audit. It never grants privilege automatically upon registration or based
+on browser email/role claims. Runtime platform authorization checks the authenticated
+user ID against that persisted grant. The seed refuses existing conflicting grants.
+A read-only platform control center is implemented. No tenant-service bypass is implemented. Deleting the grant revokes access
+on the next authorization check.
+
+## Protected platform reporting
+
+Milestones 1–2 add private routes and authorized global metadata reporting. Layouts
+and each exported read independently verify the current session and singleton grant.
+Anonymous access redirects to sign-in; ordinary users and revoked grants receive an
+unavailable response. Organization owner/admin membership never satisfies this check.
+Account-menu visibility is based on a server-side lookup of the authenticated user's
+own grant, and is not an authorization control for the destination.
+
+No caches preserve platform privileges across requests. Platform routes are dynamic,
+private/no-store and noindex. No platform mutation endpoints, additional administrator
+grants, impersonation, customer-content views, lifecycle changes, or exports are added.
+Read DTOs expose only approved identity and business metadata plus role/status and
+creation timestamps. Reporting audits expose action, actor ID, source and timestamp,
+not message bodies or arbitrary event payloads. MFA/recent authentication remains a
+production security gate, particularly before adding high-impact administrative mutations.
+
+## Authentication landing and deep links
+
+The server resolves the live platform grant before considering membership preferences.
+Organization owners and admins cannot grant themselves platform permissions. Local
+implemented deep links are validated against current memberships/grants; unknown and
+external destinations fall back to the appropriate default. Destination guards remain
+mandatory. The request proxy supplies only a path hint, never trusted identity claims.
+See [access hierarchy decision](decisions/003-access-hierarchy.md).
+
+## Public demo inquiries
+
+The public inquiry action validates the configured origin, honeypot, consent and bounded
+fields, and uses global/request/email database budgets. Success follows a committed
+inquiry-plus-audit transaction. Records store no raw IP, password or session, and errors
+return no connection details. No public inquiry read operation exists. Public homepage
+rendering does not inspect authentication cookies or connect to MongoDB. Private routes
+remain protected regardless of crawler configuration.

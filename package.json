@@ -2,14 +2,18 @@
   "name": "relay-sales",
   "version": "0.1.0",
   "scripts": {
-    "dev": "node_modules/node/bin/node node_modules/next/dist/bin/next dev --hostname 127.0.0.1",
-    "build": "node_modules/node/bin/node node_modules/next/dist/bin/next build",
-    "start": "node_modules/node/bin/node node_modules/next/dist/bin/next start --hostname 127.0.0.1",
+    "dev": "NEXT_TELEMETRY_DISABLED=1 node_modules/node/bin/node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --webpack",
+    "build": "NEXT_TELEMETRY_DISABLED=1 node_modules/node/bin/node node_modules/next/dist/bin/next build --webpack",
+    "start": "NEXT_TELEMETRY_DISABLED=1 node_modules/node/bin/node node_modules/next/dist/bin/next start --hostname 127.0.0.1",
     "lint": "node_modules/node/bin/node node_modules/eslint/bin/eslint.js .",
     "typecheck": "node_modules/node/bin/node node_modules/typescript/bin/tsc --noEmit",
     "test": "node_modules/node/bin/node node_modules/vitest/vitest.mjs run",
     "test:e2e": "node_modules/node/bin/node node_modules/@playwright/test/cli.js test",
-    "db:indexes": "node_modules/node/bin/node --conditions=react-server --env-file=.env.local --import tsx scripts/indexes.ts"
+    "db:indexes": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/indexes.ts",
+    "format": "node_modules/node/bin/node node_modules/prettier/bin/prettier.cjs --write .",
+    "seed:super-admin": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/seed-super-admin.ts",
+    "build:e2e": "NEXT_BUILD_DIR=.next-platform-tests npm run build",
+    "predev": "node_modules/node/bin/node scripts/fix-dev-performance.mjs"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +21,7 @@
   "dependencies": {
     "@better-auth/mongo-adapter": "^1.7.7",
     "@hookform/resolvers": "^5.9.1",
+    "@radix-ui/react-dialog": "^1.2.0",
     "@radix-ui/react-dropdown-menu": "^2.1.25",
     "@radix-ui/react-slot": "^1.4.0",
     "better-auth": "^1.7.7",
@@ -29,6 +34,8 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-hook-form": "^7.90.0",
+    "react-is": "^19.3.0",
+    "recharts": "^3.10.1",
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5"
@@ -44,6 +51,7 @@
     "eslint-config-next": "^16.4.0",
     "mongodb-memory-server": "^11.3.0",
     "node": "^22.23.3",
+    "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",

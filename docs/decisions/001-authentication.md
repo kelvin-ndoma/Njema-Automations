@@ -18,6 +18,7 @@ security upgrades require review and session regression tests. Identity lifecycl
 hooks are not transactionally coupled to the domain organization transaction.
 
 Sources checked during implementation:
+
 - https://better-auth.com/docs/adapters/mongo
 - https://better-auth.com/docs/authentication/email-password
 - https://better-auth.com/docs/concepts/rate-limit
