@@ -12,6 +12,7 @@ import { workspaceFor, type Workspace } from './service';
 
 export type WorkspaceHome = {
   workspace: Workspace;
+  viewerName: string;
   employee: {
     name: string;
     revision: number;
@@ -50,6 +51,7 @@ export async function getWorkspaceHome(slug: string): Promise<WorkspaceHome> {
   const workspace = await workspaceFor(user.id, slug);
   await authorizeOrganizationAccess(workspace.id, user.id, 'workspace:read');
   await connectDb();
+  const viewerName = user.name?.trim().split(/\s+/)[0] || 'there';
 
   const [
     employee,
@@ -104,6 +106,7 @@ export async function getWorkspaceHome(slug: string): Promise<WorkspaceHome> {
 
   return {
     workspace,
+    viewerName,
     employee: employee
       ? {
           name: employee.name,

@@ -5,6 +5,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import mongoose, { Types } from 'mongoose';
+import { hashPassword } from 'better-auth/crypto';
 import { getAuth } from '../src/server/auth';
 import { authClient, connectDb } from '../src/server/db';
 import { getEnv } from '../src/server/env';
@@ -202,19 +203,67 @@ async function signIn(email: string, password: string) {
   return session.user;
 }
 
+/**
+ * Better Auth email sign-in requires credential.accountId === user.id (string).
+ * Raw password updates that leave a mismatched accountId look like “invalid password”.
+ */
+async function syncDemoOwnerPassword(userId: string, password: string) {
+  const db = authClient().db(getEnv().MONGODB_DB);
+  const passwordHash = await hashPassword(password);
+  const account = await db.collection('account').findOne({
+    providerId: 'credential',
+    userId: { $in: [userId, new Types.ObjectId(userId)] },
+  });
+  const now = new Date();
+  if (account) {
+    await db.collection('account').updateOne(
+      { _id: account._id, providerId: 'credential' },
+      {
+        $set: {
+          password: passwordHash,
+          userId,
+          accountId: userId,
+          updatedAt: now,
+        },
+      },
+    );
+  } else {
+    await db.collection('account').insertOne({
+      accountId: userId,
+      providerId: 'credential',
+      userId,
+      password: passwordHash,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+  await db.collection('session').deleteMany({
+    userId: { $in: [userId, new Types.ObjectId(userId)] },
+  });
+}
+
 async function ensureDemoOwner(demo: DemoOrg, password: string) {
   const db = authClient().db(getEnv().MONGODB_DB);
   const existing = await db.collection('user').findOne({ email: demo.ownerEmail });
   if (existing) {
-    if (await hasSuperAdminGrant(db, String(existing._id)))
+    const userId = String(existing._id);
+    if (await hasSuperAdminGrant(db, userId))
       throw new Error('Demo owner unexpectedly has platform privileges.');
-    return { id: String(existing._id), created: false };
+    await syncDemoOwnerPassword(userId, password);
+    const verified = await getAuth().api.signInEmail({
+      body: { email: demo.ownerEmail, password },
+      asResponse: true,
+    });
+    if (!verified.ok) throw new Error(`Demo owner password sync failed for ${demo.slug}.`);
+    return { id: userId, created: false };
   }
   const created = await getAuth().api.signUpEmail({
     body: { name: demo.ownerName, email: demo.ownerEmail, password },
   });
   if (await hasSuperAdminGrant(db, created.user.id))
     throw new Error('Demo owner unexpectedly has platform privileges.');
+  // Normalize accountId/userId to strings Better Auth expects on sign-in.
+  await syncDemoOwnerPassword(created.user.id, password);
   return { id: created.user.id, created: true };
 }
 

@@ -4,6 +4,7 @@ import { workspaceFor, limitMutation } from '@/modules/organizations/service';
 import { contactInput, contactOptOutInput, opportunityStageInput } from './input';
 import {
   createManualContact,
+  getContactDetail,
   listContacts,
   listOpportunities,
   moveOpportunityStage,
@@ -13,7 +14,13 @@ import {
 export async function getCrmContacts(slug: string) {
   const user = await requireUser();
   const workspace = await workspaceFor(user.id, slug);
-  return { workspace, contacts: await listContacts(workspace.id, user.id) };
+  return { workspace, ...(await listContacts(workspace.id, user.id)) };
+}
+
+export async function getCrmContact(slug: string, contactId: string) {
+  const user = await requireUser();
+  const workspace = await workspaceFor(user.id, slug);
+  return { workspace, ...(await getContactDetail(workspace.id, user.id, contactId)) };
 }
 
 export async function getCrmPipeline(slug: string) {

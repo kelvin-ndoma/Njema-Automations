@@ -22,7 +22,7 @@ export function InboxAssignForm({
   );
   if (readOnly) return null;
   return (
-    <form action={action} className="mt-4 flex flex-wrap items-end gap-3">
+    <form action={action} className="mt-5 flex flex-wrap items-end gap-3 border-t border-input pt-4">
       <label className="block min-w-[12rem] flex-1 text-sm">
         <span className="mb-2 block font-medium">Assign to teammate</span>
         <select

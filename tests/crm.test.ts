@@ -116,9 +116,16 @@ it('creates contact and opportunity from consented website lead and allows stage
   const contacts = await getCrmContacts('crm-business');
   expect(contacts.contacts[0]?.email).toBe('casey@lead.example');
   expect(contacts.contacts[0]?.source).toBe('website_widget');
+  expect(contacts.contacts[0]?.opportunities.length).toBeGreaterThan(0);
+  expect(contacts.pipeline.stages.some((stage) => stage.key === 'new' && stage.count >= 1)).toBe(
+    true,
+  );
+  expect(contacts.recentActivity.length).toBeGreaterThan(0);
+  expect(contacts.totals.opportunities).toBeGreaterThan(0);
   const pipeline = await getCrmPipeline('crm-business');
   expect(pipeline.opportunities[0]?.stageKey).toBe('new');
   expect(pipeline.opportunities[0]?.contactEmail).toBe('casey@lead.example');
+  expect(pipeline.stages.find((stage) => stage.key === 'new')?.opportunities.length).toBe(1);
   await updateOpportunityStage('crm-business', {
     opportunityId: pipeline.opportunities[0]!.id,
     stageKey: 'qualified',
@@ -126,4 +133,6 @@ it('creates contact and opportunity from consented website lead and allows stage
   const moved = await getCrmPipeline('crm-business');
   expect(moved.opportunities[0]?.stageKey).toBe('qualified');
   expect(moved.opportunities[0]?.status).toBe('open');
+  expect(moved.stages.find((stage) => stage.key === 'qualified')?.opportunities.length).toBe(1);
+  expect(moved.stages.find((stage) => stage.key === 'new')?.opportunities.length).toBe(0);
 });

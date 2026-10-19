@@ -46,7 +46,10 @@ export function WorkspaceNavigation({ slug, editable }: { slug: string; editable
         .filter((area) => area.suffix !== '/test-chat' || editable)
         .map((area) => {
           const href = `/app/${slug}${area.suffix}`;
-          const active = path === href;
+          const active =
+            area.suffix === ''
+              ? path === href
+              : path === href || path.startsWith(`${href}/`);
           return (
             <Link
               key={href}

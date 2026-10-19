@@ -22,108 +22,139 @@ export default async function Page({
   const { workspace, conversation } = data;
   const readOnly = !!(workspace.supportMode || workspace.readOnly);
   const sales = conversation.sales;
+  const contactName = sales?.contact?.name;
+  const formatWhen = (value: string) =>
+    new Intl.DateTimeFormat(workspace.locale, {
+      timeZone: workspace.timeZone,
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value));
+
   return (
-    <main className="mx-auto max-w-5xl px-6 py-8 sm:px-8">
-      <Link href={`/app/${orgSlug}/inbox`} className="text-sm text-primary">
-        ← Inbox
-      </Link>
-      <h1 className="mt-4 text-3xl font-semibold">Conversation</h1>
-      <p className="mt-3 text-sm text-muted-foreground">
-        {conversation.controlMode === 'human'
-          ? 'Human team control — the AI employee cannot publish until resumed.'
-          : 'AI employee is responding. Take over to reply as your team.'}
-      </p>
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <dl className="grid gap-3 rounded-xl border border-input p-5 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-muted-foreground">Control</dt>
-              <dd className="mt-1 capitalize">{conversation.controlMode}</dd>
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mb-4">
+        <Link href={`/app/${orgSlug}/inbox`} className="text-sm font-medium text-primary">
+          ← Inbox
+        </Link>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-input bg-background lg:grid lg:grid-cols-[minmax(0,1.6fr)_300px]">
+        <section className="flex min-h-[70vh] flex-col">
+          <header className="border-b border-input bg-[#f7f8f4] px-5 py-4 sm:px-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  {contactName ?? 'Website visitor'}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {sales?.contact?.email ?? conversation.origin}
+                </p>
+                <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  <span>{conversation.controlMode === 'human' ? 'Team in control' : 'AI responding'}</span>
+                  {conversation.hasLead && <span>Lead captured</span>}
+                  {conversation.needsHuman && (
+                    <span className="font-medium text-amber-700">Needs you</span>
+                  )}
+                  {conversation.requestContact && <span>Contact requested</span>}
+                </p>
+              </div>
             </div>
-            <div>
-              <dt className="text-muted-foreground">Status</dt>
-              <dd className="mt-1">
-                {conversation.hasLead ? 'Lead captured' : 'Open'}
-                {conversation.needsHuman ? ' · Needs human' : ''}
-                {conversation.requestContact ? ' · Contact requested' : ''}
-              </dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="text-muted-foreground">Origin</dt>
-              <dd className="mt-1 break-all">{conversation.origin}</dd>
-            </div>
-          </dl>
-          {conversation.qualificationNotes && (
-            <section className="mt-6 rounded-xl border border-input p-5">
-              <h2 className="text-sm font-semibold">Qualification notes</h2>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
-                {conversation.qualificationNotes}
-              </p>
-            </section>
-          )}
-          <section className="mt-8 space-y-4" aria-label="Messages">
-            <h2 className="text-lg font-semibold">Thread</h2>
+          </header>
+
+          <div
+            className="flex-1 space-y-3 overflow-y-auto bg-[#fbfcf9] px-4 py-5 sm:px-6"
+            aria-label="Messages"
+          >
             {!conversation.messages.length && (
-              <p className="text-sm text-muted-foreground">No completed messages yet.</p>
+              <p className="py-10 text-center text-sm text-muted-foreground">
+                No messages in this thread yet.
+              </p>
             )}
-            {conversation.messages.map((message) => (
-              <article key={message.id} className="rounded-xl border border-input p-4">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    {message.role === 'visitor'
-                      ? 'Visitor'
-                      : message.role === 'human'
-                        ? 'Team'
-                        : 'AI employee'}
-                  </p>
-                  <time className="text-xs text-muted-foreground" dateTime={message.createdAt}>
-                    {new Intl.DateTimeFormat(workspace.locale, {
-                      timeZone: workspace.timeZone,
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(new Date(message.createdAt))}
-                  </time>
-                </div>
-                <p className="mt-2 text-sm leading-6">{message.content}</p>
-              </article>
-            ))}
-          </section>
-          <section className="mt-8 rounded-xl border border-input p-5">
-            <h2 className="text-sm font-semibold">Collaborate</h2>
-            <div className="mt-4">
-              <InboxConversationControls
-                slug={orgSlug}
-                conversationId={conversation.id}
-                controlMode={conversation.controlMode}
-                readOnly={readOnly}
-              />
-              <InboxAssignForm
-                slug={orgSlug}
-                conversationId={conversation.id}
-                assigneeId={conversation.assigneeId}
-                teamMembers={conversation.teamMembers}
-                readOnly={readOnly}
-              />
-            </div>
-          </section>
-        </div>
-        <aside className="space-y-4" aria-label="Sales context">
-          <section className="rounded-xl border border-input p-5">
-            <h2 className="text-sm font-semibold">Sales context</h2>
+            {conversation.messages.map((message) => {
+              const fromVisitor = message.role === 'visitor';
+              const fromTeam = message.role === 'human';
+              return (
+                <article
+                  key={message.id}
+                  className={`flex ${fromVisitor ? 'justify-start' : 'justify-end'}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-[75%] ${
+                      fromVisitor
+                        ? 'rounded-bl-md border border-input bg-white text-foreground'
+                        : fromTeam
+                          ? 'rounded-br-md bg-primary text-primary-foreground'
+                          : 'rounded-br-md bg-[#e0e9df] text-foreground'
+                    }`}
+                  >
+                    <div className="mb-1 flex items-baseline justify-between gap-3">
+                      <p
+                        className={`text-[11px] font-medium uppercase tracking-[0.08em] ${
+                          fromTeam ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                        }`}
+                      >
+                        {fromVisitor ? 'Visitor' : fromTeam ? 'Team' : 'AI employee'}
+                      </p>
+                      <time
+                        className={`text-[11px] ${
+                          fromTeam ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                        }`}
+                        dateTime={message.createdAt}
+                      >
+                        {formatWhen(message.createdAt)}
+                      </time>
+                    </div>
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="border-t border-input bg-background px-5 py-4 sm:px-6">
+            <InboxConversationControls
+              slug={orgSlug}
+              conversationId={conversation.id}
+              controlMode={conversation.controlMode}
+              readOnly={readOnly}
+            />
+            <InboxAssignForm
+              slug={orgSlug}
+              conversationId={conversation.id}
+              assigneeId={conversation.assigneeId}
+              teamMembers={conversation.teamMembers}
+              readOnly={readOnly}
+            />
+          </div>
+        </section>
+
+        <aside
+          className="space-y-6 border-t border-input bg-[#f3f5f0] p-5 lg:border-l lg:border-t-0"
+          aria-label="Sales context"
+        >
+          <section>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              Sales context
+            </h2>
             {!sales?.contact && !sales?.opportunity ? (
-              <p className="mt-3 text-sm text-muted-foreground">
-                No CRM records yet. Consented leads create contacts and opportunities.
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                No CRM records yet. Consented leads create a contact and opportunity.
               </p>
             ) : (
-              <dl className="mt-3 space-y-3 text-sm">
+              <dl className="mt-4 space-y-4 text-sm">
                 {sales.contact && (
                   <div>
                     <dt className="text-muted-foreground">Contact</dt>
                     <dd className="mt-1">
-                      <Link className="text-primary" href={`/app/${orgSlug}/crm`}>
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={`/app/${orgSlug}/crm/${sales.contact.id}`}
+                      >
                         {sales.contact.name}
                       </Link>
-                      <span className="block text-muted-foreground">{sales.contact.email}</span>
+                      <span className="mt-0.5 block text-muted-foreground">
+                        {sales.contact.email}
+                      </span>
                     </dd>
                   </div>
                 )}
@@ -131,10 +162,13 @@ export default async function Page({
                   <div>
                     <dt className="text-muted-foreground">Opportunity</dt>
                     <dd className="mt-1">
-                      <Link className="text-primary" href={`/app/${orgSlug}/crm/pipeline`}>
+                      <Link
+                        className="font-medium text-primary hover:underline"
+                        href={`/app/${orgSlug}/crm/pipeline`}
+                      >
                         {sales.opportunity.title}
                       </Link>
-                      <span className="mt-1 block capitalize text-muted-foreground">
+                      <span className="mt-0.5 block capitalize text-muted-foreground">
                         {sales.opportunity.stageKey} · {sales.opportunity.status}
                       </span>
                     </dd>
@@ -143,76 +177,61 @@ export default async function Page({
               </dl>
             )}
           </section>
-          <section className="rounded-xl border border-input p-5">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold">Quotations</h2>
-              <Link href={`/app/${orgSlug}/quotations`} className="text-xs text-primary">
-                Open
-              </Link>
-            </div>
-            {!sales?.quotations.length ? (
-              <p className="mt-3 text-sm text-muted-foreground">None linked yet.</p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm">
-                {sales.quotations.map((quote) => (
-                  <li key={quote.id}>
-                    {quote.title}{' '}
-                    <span className="capitalize text-muted-foreground">({quote.status})</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-          <section className="rounded-xl border border-input p-5">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold">Appointments</h2>
-              <Link href={`/app/${orgSlug}/appointments`} className="text-xs text-primary">
-                Open
-              </Link>
-            </div>
-            {!sales?.appointments.length ? (
-              <p className="mt-3 text-sm text-muted-foreground">None linked yet.</p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm">
-                {sales.appointments.map((appt) => (
-                  <li key={appt.id}>
-                    {appt.title}{' '}
-                    <span className="capitalize text-muted-foreground">({appt.status})</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-          <section className="rounded-xl border border-input p-5">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold">Follow-ups</h2>
-              <Link href={`/app/${orgSlug}/follow-ups`} className="text-xs text-primary">
-                Open
-              </Link>
-            </div>
-            {!sales?.followUps.length ? (
-              <p className="mt-3 text-sm text-muted-foreground">None scheduled.</p>
-            ) : (
-              <ul className="mt-3 space-y-2 text-sm">
-                {sales.followUps.map((job) => (
-                  <li key={job.id}>
-                    <span className="capitalize">{job.status}</span>
-                    <span className="block text-xs text-muted-foreground">{job.reason}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+
+          {conversation.qualificationNotes && (
+            <section>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Qualification
+              </h2>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+                {conversation.qualificationNotes}
+              </p>
+            </section>
+          )}
+
+          <RelatedList
+            title="Quotations"
+            href={`/app/${orgSlug}/quotations`}
+            empty="None linked"
+            items={(sales?.quotations ?? []).map((quote) => ({
+              id: quote.id,
+              label: quote.title,
+              meta: quote.status,
+            }))}
+          />
+          <RelatedList
+            title="Appointments"
+            href={`/app/${orgSlug}/appointments`}
+            empty="None linked"
+            items={(sales?.appointments ?? []).map((appt) => ({
+              id: appt.id,
+              label: appt.title,
+              meta: appt.status,
+            }))}
+          />
+          <RelatedList
+            title="Follow-ups"
+            href={`/app/${orgSlug}/follow-ups`}
+            empty="None scheduled"
+            items={(sales?.followUps ?? []).map((job) => ({
+              id: job.id,
+              label: job.reason,
+              meta: job.status,
+            }))}
+          />
+
           {!!sales?.activities.length && (
-            <section className="rounded-xl border border-input p-5">
-              <h2 className="text-sm font-semibold">Recent activity</h2>
-              <ul className="mt-3 space-y-3 text-sm">
+            <section>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                Activity
+              </h2>
+              <ul className="mt-3 space-y-3">
                 {sales.activities.map((activity) => (
-                  <li key={activity.id}>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                      {activity.type.replace('_', ' ')}
+                  <li key={activity.id} className="text-sm">
+                    <p className="text-xs capitalize text-muted-foreground">
+                      {activity.type.replaceAll('_', ' ')}
                     </p>
-                    <p className="mt-1">{activity.body}</p>
+                    <p className="mt-1 leading-5">{activity.body}</p>
                   </li>
                 ))}
               </ul>
@@ -221,5 +240,42 @@ export default async function Page({
         </aside>
       </div>
     </main>
+  );
+}
+
+function RelatedList({
+  title,
+  href,
+  empty,
+  items,
+}: {
+  title: string;
+  href: string;
+  empty: string;
+  items: Array<{ id: string; label: string; meta: string }>;
+}) {
+  return (
+    <section>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          {title}
+        </h2>
+        <Link href={href} className="text-xs font-medium text-primary">
+          Open
+        </Link>
+      </div>
+      {!items.length ? (
+        <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
+      ) : (
+        <ul className="mt-3 space-y-2 text-sm">
+          {items.map((item) => (
+            <li key={item.id}>
+              <p className="leading-5">{item.label}</p>
+              <p className="capitalize text-muted-foreground">{item.meta}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
