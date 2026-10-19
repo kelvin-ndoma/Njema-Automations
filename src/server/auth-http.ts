@@ -4,8 +4,17 @@ import { getAuth } from './auth';
 import { enforceLimit, RateLimited } from './rate-limit';
 import { getEnv } from './env';
 import { authOrigins } from '@/lib/auth-origins';
+import { userIsRestricted } from './access-state';
 export async function handleAuth(request: Request) {
   try {
+    if (request.headers.has('cookie')) {
+      const session = await getAuth().api.getSession({ headers: request.headers });
+      if (session && (await userIsRestricted(session.user.id)))
+        return Response.json(
+          { code: 'ACCOUNT_RESTRICTED', message: 'This account is restricted. Contact support.' },
+          { status: 403 },
+        );
+    }
     if (request.method === 'POST') {
       if (!authOrigins(getEnv().BETTER_AUTH_URL).includes(request.headers.get('origin') ?? ''))
         return Response.json({ message: 'Invalid request origin.' }, { status: 403 });

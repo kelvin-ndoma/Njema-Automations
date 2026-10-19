@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { getPlatformOrganization } from '@/modules/platform/read-repository';
 import type { SearchParams } from '@/modules/platform/input';
 import {
@@ -13,6 +13,9 @@ import {
 } from '@/components/platform/presentation';
 import { Pagination } from '@/components/platform/data-table';
 import { MembershipTable } from '@/components/platform/membership-table';
+import { OrganizationOperations } from '@/components/platform/organization-operations';
+import { Button } from '@/components/ui/button';
+import { requirePlatformOperator } from '@/modules/platform/service';
 export default async function Page({
   params,
   searchParams,
@@ -20,6 +23,7 @@ export default async function Page({
   params: Promise<{ id: string }>;
   searchParams: Promise<SearchParams>;
 }) {
+  const operator = await requirePlatformOperator();
   const { id } = await params;
   const data = await getPlatformOrganization(id, await searchParams);
   if (!data) notFound();
@@ -33,8 +37,22 @@ export default async function Page({
         <ArrowLeft size={14} /> Organization directory
       </Link>
       <PageHeading eyebrow="Organization profile" title={org.name} description={`/${org.slug}`}>
-        <StatusBadge status={org.status} />
+        <div className="flex flex-wrap items-center gap-3">
+          <StatusBadge status={org.status} />
+          <Button asChild>
+            <Link href={`/app/${org.slug}`}>
+              Open customer workspace <ArrowUpRight size={16} />
+            </Link>
+          </Button>
+        </div>
       </PageHeading>
+      <p className="mb-5 max-w-2xl text-sm text-muted-foreground">
+        This page is the platform operator profile for the company. To see their workspace, use{' '}
+        <strong>Open customer workspace</strong> if you already have membership, or{' '}
+        <strong>Mask into organization (support mode)</strong> below for a timed, audited,
+        read-only support session. Org team members who sign in land in their own `/app` workspace
+        — they do not receive platform access.
+      </p>
       <div className="grid gap-5 xl:grid-cols-[1.3fr_1fr]">
         <div className="space-y-5">
           <Panel title="Business profile">
@@ -87,6 +105,12 @@ export default async function Page({
           <AuditList events={data.activity} />
         </Panel>
       </div>
+      <OrganizationOperations
+        id={org.id}
+        slug={org.slug}
+        status={org.status}
+        canPrivileged={operator.platformRole === 'super-admin'}
+      />
     </>
   );
 }

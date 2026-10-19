@@ -26,7 +26,16 @@ export async function connectDb() {
 }
 export function authClient() {
   const env = getEnv();
-  return (globalDb.authClient ??= new MongoClient(env.MONGODB_URI, {
-    serverSelectionTimeoutMS: 5000,
-  }));
+  if (!globalDb.authClient) {
+    const client = new MongoClient(env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      maxPoolSize: 10,
+    });
+    // Warm once per process so the first authenticated navigation is not alone on connect.
+    void client.connect().catch(() => {
+      /* Later operations still surface connection failures. */
+    });
+    globalDb.authClient = client;
+  }
+  return globalDb.authClient;
 }

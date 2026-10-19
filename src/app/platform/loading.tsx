@@ -1,9 +1,14 @@
 export default function Loading() {
   return (
-    <div role="status" className="animate-pulse">
+    <div role="status" className="animate-pulse space-y-4">
       <p className="text-sm text-muted-foreground">Loading platform data…</p>
-      <div className="mt-5 h-8 w-56 rounded bg-muted" />
-      <div className="mt-6 h-48 rounded-xl bg-muted" />
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="h-24 rounded-xl bg-muted" />
+        <div className="h-24 rounded-xl bg-muted" />
+        <div className="h-24 rounded-xl bg-muted" />
+        <div className="h-24 rounded-xl bg-muted" />
+      </div>
+      <div className="h-64 rounded-xl bg-muted" />
     </div>
   );
 }

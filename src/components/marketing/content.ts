@@ -59,11 +59,11 @@ export const industries = [
 export const faqs = [
   [
     'What can I use today?',
-    'The working foundation includes secure accounts, organization creation, membership-based workspaces and organization switching. The private platform control center provides organization and user directories, real operational metrics and audit metadata. AI employees, messaging channels, qualification and automated follow-ups are planned capabilities.',
+    'You can create a secure business workspace, configure an AI sales employee with approved knowledge, goals and qualification rules, install the website chat widget on allowed origins, capture consented leads, manage CRM pipelines and in-app follow-up reminders, draft quotations, request appointments, assign conversations, and prepare email/WhatsApp channel configuration. Outbound email/WhatsApp delivery, external calendar sync, and payment checkout still require verified provider activation.',
   ],
   [
     'Is the product already sending AI replies?',
-    'No. The conversation visuals are clearly labeled product concepts. Live AI responses and automated sales workflows are not available in this development preview.',
+    'Yes for configured installs: the website widget can send grounded replies when an OpenAI connection is configured. Private test chat is also available to owners and administrators. Multi-channel messaging and automated follow-ups are not available yet.',
   ],
   [
     'Is this built for one industry?',

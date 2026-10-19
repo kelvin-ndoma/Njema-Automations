@@ -58,13 +58,19 @@ repository content until upstream resolves the advisory.
 
 ## Explicit super-admin seed
 
+The current seed requires account ownership proof through Better Auth password
+authentication before granting the matching user ID. It prompts without echo for
+the existing account password; an unverified email match alone is insufficient.
+Decision 007 records this hardening. No configured-database seed was run during
+the product-build continuation.
+
 The owner-requested bootstrap email is `kelvinndomamutua@gmail.com`. The terminal-only
 seed command creates the account through Better Auth if needed, with a privately
 entered password, and transactionally creates a singleton `platformRoles` grant and
 identity audit. It never grants privilege automatically upon registration or based
 on browser email/role claims. Runtime platform authorization checks the authenticated
 user ID against that persisted grant. The seed refuses existing conflicting grants.
-A read-only platform control center is implemented. No tenant-service bypass is implemented. Deleting the grant revokes access
+An operational platform control center is implemented. Ordinary tenant services retain membership checks. Deleting the grant revokes access
 on the next authorization check.
 
 ## Protected platform reporting
@@ -77,12 +83,18 @@ Account-menu visibility is based on a server-side lookup of the authenticated us
 own grant, and is not an authorization control for the destination.
 
 No caches preserve platform privileges across requests. Platform routes are dynamic,
-private/no-store and noindex. No platform mutation endpoints, additional administrator
-grants, impersonation, customer-content views, lifecycle changes, or exports are added.
-Read DTOs expose only approved identity and business metadata plus role/status and
-creation timestamps. Reporting audits expose action, actor ID, source and timestamp,
-not message bodies or arbitrary event payloads. MFA/recent authentication remains a
-production security gate, particularly before adding high-impact administrative mutations.
+private/no-store and noindex. Operational mutations recheck the singleton grant inside
+transactions and atomically append privileged audit records. Typed target confirmations
+protect lifecycle, account and subscription changes; the sole administrator is protected.
+Tenant suspension, read-only restrictions and account restrictions are enforced by services
+and direct repositories. Session creation rejects restricted accounts without altering passwords.
+No additional platform grants, impersonation, customer-content views or exports are exposed.
+Read DTOs expose approved identity/business metadata and operational policy, never credential
+or session tokens. Audit details return an explicit metadata allowlist.
+Support access requires a reason, is actor-bound and short-lived, and exposes read-only
+business metadata with a banner and explicit exit; it never bypasses tenant services.
+MFA/recent authentication, infrastructure retention and backup drills remain production gates.
+See decision 009 for the implemented operational security boundaries.
 
 ## Authentication landing and deep links
 
@@ -101,3 +113,29 @@ inquiry-plus-audit transaction. Records store no raw IP, password or session, an
 return no connection details. No public inquiry read operation exists. Public homepage
 rendering does not inspect authentication cookies or connect to MongoDB. Private routes
 remain protected regardless of crawler configuration.
+
+## Employee configuration and private test replies
+
+Owner/admin membership controls employee/business settings writes and private test
+chat execution/history. Other active members may read employee configuration and
+business settings. Platform grants do not bypass those permissions. Repositories
+recheck memberships, and configuration/settings writes include transactional metadata
+audits. Configuration revisions reject stale saves. Tenant-scoped indexes enforce
+one employee per organization and unique test request IDs.
+
+Provider secrets stay server-only. Test calls use a fixed OpenAI endpoint, no tools,
+bounded prompt/output sizes, timeout, structured output and local evidence checks.
+Per-organization daily request/token reservations precede external calls and are
+reconciled on completion. Failed/unknown calls retain their reservations. Revocation
+before publication denies the result even if provider execution already occurred.
+No live-provider grounding, dollar spending guarantee or human-takeover safety is
+claimed by the private test slice. See decision 006.
+
+## Website widget and consented leads
+
+Website chat uses a public loader and `/api/widget/*` routes. Installation keys only
+identify a tenant; exact allowed origins authorize browser calls. Visitor bearer
+tokens are hashed at rest, origin-bound and TTL-limited. Membership sessions never
+come from the widget. Inbox reads require an active tenant membership; foreign
+workspaces and foreign origins are denied. Usage reservations share the organization
+daily AI ledger with private tests. See decision 010.

@@ -46,11 +46,17 @@ sets an HTTP-only preference cookie; that cookie never grants access.
 `/account`, `/api/auth/[...all]`. Root redirects to organization selection.
 Data pages and actions independently authenticate; the layout is not the only guard.
 
+## Website widget (M3 slice)
+
+`/app/[orgSlug]/widget` configures allowed origins and embeds `/api/widget/loader`.
+Public visitor APIs under `/api/widget/*` authorize by exact Origin allow-list and
+origin-bound visitor tokens. `/app/[orgSlug]/inbox` lists consented leads and recent
+website conversations for active members. Human takeover remains future work.
+
 ## Future modules
 
-Onboarding/settings/team → employees/knowledge/AI → website chat/conversations →
-CRM/qualification/pipelines → quotations/scheduling/follow-ups → analytics/usage/
-billing/advanced platform operations → other channel integrations. These modules remain unimplemented.
+Team invitations → human takeover/assignment → CRM pipelines → quotations/scheduling/
+follow-ups → customer analytics → payment checkout → other channel integrations.
 Provider abstractions and durable jobs will be selected in their relevant milestones.
 
 ## Platform reporting (Milestones 1–2)

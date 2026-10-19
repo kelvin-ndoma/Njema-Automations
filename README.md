@@ -1,8 +1,8 @@
 # Relay — AI sales workforce
 
-Phase 1 foundation and platform control center Milestones 1–2 of a global,
-multi-industry SaaS. Local development only.
-No AI execution, CRM, invitations, billing, workers or integrations are implemented yet.
+Multi-tenant Relay foundation with employee configuration, private AI test chat, and
+an operational Super Admin control center. Local development only. CRM, public chat,
+payment processing, invitations, workers and external integrations remain unfinished.
 
 ## Local setup
 
@@ -55,6 +55,26 @@ Local sockets and these downloads may require sandbox permission. Services bind 
 loopback. Tests contain clearly labeled synthetic test identities and businesses.
 Production build does not require real secrets; authenticated runtime does.
 
+## Product build continuation
+
+The expanded product scope and executable milestones are tracked in
+[docs/product-build.md](docs/product-build.md). The original roadmap is historical.
+Business settings are available at `/app/[orgSlug]/settings`; employee configuration
+and approved text knowledge at `/app/[orgSlug]/employee`. Owners/admins can edit;
+other active members can read. Run the explicit index setup when intentionally
+provisioning a development database; new unique tenant indexes are required.
+
+`/app/[orgSlug]/test-chat` provides owner/admin-only standalone test questions and
+the latest ten persisted results. `/app/[orgSlug]/widget` configures allowed website
+origins and the embed snippet; `/app/[orgSlug]/inbox` lists consented visitor leads.
+Privately configure `OPENAI_API_KEY` and `OPENAI_MODEL` in the ignored `.env` to
+enable actual OpenAI execution. No model is selected automatically. Use a model that
+supports Responses API structured outputs. The initial ceiling is 20 requests and
+100,000 token units per organization per UTC day, with a 512-token output limit.
+This is not a paid plan or dollar cap. Failed/uncertain calls retain their
+reservations; duplicate submissions cannot call the provider twice. Human takeover
+and CRM pipelines are not available yet. Test fixtures never call a real paid provider.
+
 See [architecture](docs/architecture.md), [security](docs/security.md),
 [roadmap](docs/roadmap.md), and [authentication decision](docs/decisions/001-authentication.md).
 
@@ -63,7 +83,9 @@ See [architecture](docs/architecture.md), [security](docs/security.md),
 Run `npm run seed:super-admin` locally. The only allowed seed email is
 `kelvinndomamutua@gmail.com`. If the account is absent, the terminal prompts for a
 12–128 character password without echoing it; Better Auth creates the account and
-hashes the password. Existing accounts keep their passwords. Never send the password
+hashes the password. Existing accounts keep their passwords; the command prompts for
+their current password and verifies it through Better Auth before assigning any grant.
+An email match alone cannot bootstrap platform privilege. Never send the password
 in chat or pass it as a command-line argument.
 
 The role is an idempotent singleton grant linked to the persisted user ID, independent
@@ -80,16 +102,21 @@ Sign in with the seeded super-admin account, then open **Platform control center
 from the account menu or visit `/platform` directly. Organization owners/admins
 have no platform access. The existing sign-in destination and workspace routes remain.
 
-Implemented: real overview counts, 7/30/90-day UTC organization growth, recent audit
-metadata, organization search/status filters/pagination/details, and user search/
-pagination/details. Identity data is restricted to authorized name/email/verification/
-registration/membership fields. Passwords, accounts, session tokens and customer
-conversation content are never returned by these reporting queries.
+Implemented: real overview and trends; searchable organization/user directories and
+details; tenant suspension/restoration, read-only and AI restrictions; internal notes;
+account restriction and session revocation; plans, trials and administrative subscriptions;
+AI inventory, usage, model pricing and execution allowances; support requests and explicit
+expiring read-only support access; audit filters/details; system checks/incidents; and
+validated platform settings. Sensitive operations require confirmation and are audited
+transactionally. The sole Super Admin cannot be restricted or revoked through these controls.
 
-Organization lifecycle status has no field in the current domain model. Missing
-status appears as **Not recorded**, and the overview shows an unavailable active count
-when no statuses are recorded. No suspension, user mutation, billing, or marketing
-website is implemented.
+New organizations persist active lifecycle status. Legacy statuses are initialized only
+by the explicit authenticated migration in `scripts/migrate-lifecycle.ts`; existing states
+are preserved. Never infer active status from a missing field in reporting.
+Live payments, MRR, unconfigured AI providers and unavailable worker/integration telemetry
+are explicitly unavailable. Provider rates calculate estimated costs, not invoices.
+Passwords, tokens, password hashes and customer conversation content are excluded from
+platform reporting. See [operational control center decision](docs/decisions/009-operational-platform-control-center.md).
 
 See [platform architecture decision](docs/decisions/002-platform-control-center.md)
 and [Milestones 1–2 report](docs/platform-milestones-1-2.md).

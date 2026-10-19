@@ -1,13 +1,16 @@
 import { canAccessPlatform } from '@/modules/platform/service';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Building2, ChevronDown, House, Plus, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Building2, ChevronDown, Plus, ShieldCheck } from 'lucide-react';
 import { requireUser } from '@/server/session';
 import { listWorkspaces, workspaceFor } from '@/modules/organizations/service';
-import { AccessDenied } from '@/modules/organizations/policy';
+import { AccessDenied, can } from '@/modules/organizations/policy';
 import { switchOrganization } from '@/modules/organizations/actions';
 import { Brand } from '@/components/brand';
 import { AccountMenu } from '@/components/account-menu';
+import { WorkspaceNavigation, WorkspaceBreadcrumb } from '@/components/workspace-navigation';
+import { OperationForm } from '@/components/platform/operation-form';
+import { Button } from '@/components/ui/button';
 export default async function Layout({
   children,
   params,
@@ -25,10 +28,24 @@ export default async function Layout({
     if (e instanceof AccessDenied) notFound();
     throw e;
   }
-  const workspaces = await listWorkspaces(user.id);
+  // Support inspection must not list other tenant memberships in the switcher.
+  const workspaces = org.supportMode
+    ? [
+        {
+          id: org.id,
+          name: org.name,
+          slug: org.slug,
+          currency: org.currency,
+          timeZone: org.timeZone,
+          locale: org.locale,
+          role: org.role,
+        },
+      ]
+    : await listWorkspaces(user.id);
+  const editable = can(org.role, 'organization:update') && !org.readOnly && !org.supportMode;
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[230px_1fr]">
-      <aside className="border-b border-input bg-[#f3f5f0] p-5 lg:flex lg:min-h-screen lg:flex-col lg:border-r lg:border-b-0">
+      <aside className="border-b border-input bg-[#f3f5f0] p-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col lg:overflow-y-auto lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between">
           <Brand />
           <span className="text-[10px] tracking-wider text-muted-foreground">WORKSPACE</span>
@@ -49,39 +66,95 @@ export default async function Layout({
                 </button>
               </form>
             ))}
-            <Link
-              href="/organizations/new"
-              className="mt-1 flex items-center gap-2 border-t border-input px-2 py-3 text-sm"
-            >
-              <Plus size={14} /> New workspace
-            </Link>
+            {!org.supportMode && (
+              <Link
+                href="/organizations/new"
+                className="mt-1 flex items-center gap-2 border-t border-input px-2 py-3 text-sm"
+              >
+                <Plus size={14} /> New workspace
+              </Link>
+            )}
+            {org.supportMode && platformAccess && (
+              <Link
+                href={`/platform/organizations/${org.id}`}
+                className="mt-1 flex items-center gap-2 border-t border-input px-2 py-3 text-sm"
+              >
+                Back to platform profile
+              </Link>
+            )}
           </div>
         </details>
-        <nav className="mt-5" aria-label="Workspace navigation">
-          <Link
-            href={`/app/${org.slug}`}
-            aria-current="page"
-            className="flex items-center gap-3 rounded-lg bg-[#e0e9df] px-3 py-3 text-sm font-medium text-primary"
-          >
-            <House size={18} /> Overview
-          </Link>
-        </nav>
-        <div className="mt-auto hidden pt-8 lg:block">
-          <ShieldCheck size={18} className="mb-2 text-primary" />
-          <p className="text-xs leading-5 text-muted-foreground">
-            A private workspace.
-            <br />
-            Access follows your membership.
-          </p>
+        <WorkspaceNavigation slug={org.slug} editable={editable} />
+        <div className="mt-auto hidden space-y-3 pt-8 lg:block">
+          {org.supportMode && platformAccess ? (
+            <>
+              <Button asChild variant="outline" size="sm" className="w-full justify-start">
+                <Link href="/platform">
+                  <ArrowLeft size={15} />
+                  Back to platform
+                </Link>
+              </Button>
+              <p className="text-xs leading-5 text-muted-foreground">
+                Support inspection — read only.
+              </p>
+            </>
+          ) : (
+            <>
+              <ShieldCheck size={18} className="mb-2 text-primary" />
+              <p className="text-xs leading-5 text-muted-foreground">
+                A private workspace. Access follows your membership.
+              </p>
+            </>
+          )}
         </div>
       </aside>
       <div className="min-w-0">
+        {org.supportMode && (
+          <div
+            role="status"
+            className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-300 bg-amber-50 px-6 py-3 sm:px-8"
+          >
+            <div>
+              <p className="text-sm font-medium">Support mode · viewing {org.name}</p>
+              <p className="text-xs text-muted-foreground">
+                Read-only customer experience. Expires{' '}
+                {org.supportMode.expiresAt
+                  ? new Intl.DateTimeFormat('en-GB', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                      timeZone: 'UTC',
+                    }).format(new Date(org.supportMode.expiresAt))
+                  : 'soon'}{' '}
+                UTC.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {platformAccess && (
+                <Button asChild size="sm">
+                  <Link href="/platform">
+                    <ArrowLeft size={15} />
+                    Back to platform
+                  </Link>
+                </Button>
+              )}
+              <Button asChild variant="outline" size="sm">
+                <Link href={`/platform/support/access/${org.supportMode.id}`}>Issue summary</Link>
+              </Button>
+              <OperationForm
+                operation="support.exit"
+                hidden={{ id: org.supportMode.id }}
+                label="Exit support mode"
+              />
+            </div>
+          </div>
+        )}
         <header className="flex h-16 items-center justify-between border-b border-input px-6 sm:px-8">
-          <p className="text-sm text-muted-foreground">
-            Workspace <span className="mx-2 text-input">/</span>{' '}
-            <span className="text-foreground">Overview</span>
-          </p>
-          <AccountMenu name={user.name} platformAccess={platformAccess} />
+          <WorkspaceBreadcrumb />
+          <AccountMenu
+            name={user.name}
+            platformAccess={platformAccess}
+            context={org.supportMode ? 'platform' : 'app'}
+          />
         </header>
         {children}
       </div>

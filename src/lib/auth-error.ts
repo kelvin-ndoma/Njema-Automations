@@ -1,4 +1,6 @@
-export function authErrorMessage(status: number, signup: boolean) {
+export function authErrorMessage(status: number, signup: boolean, code?: string) {
+  if (code === 'ACCOUNT_RESTRICTED')
+    return 'This account is restricted. Contact your administrator.';
   if (status === 429) return 'Too many attempts. Please wait a minute.';
   if (status === 403)
     return 'This application address isn’t enabled for sign-in. Use the configured application address.';

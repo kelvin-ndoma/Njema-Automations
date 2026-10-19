@@ -8,10 +8,12 @@ const organizationSchema = new Schema(
     currency: { type: String, required: true },
     timeZone: { type: String, required: true },
     locale: { type: String, required: true },
+    status: { type: String, enum: ['active', 'suspended'], required: true, default: 'active' },
   },
   { timestamps: true },
 );
 organizationSchema.index({ slug: 1 }, { unique: true });
+organizationSchema.index({ status: 1, createdAt: -1 });
 const membershipSchema = new Schema(
   {
     organizationId: { type: Schema.Types.ObjectId, required: true },

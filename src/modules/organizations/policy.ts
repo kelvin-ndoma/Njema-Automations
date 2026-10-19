@@ -71,3 +71,4 @@ export const organizationInput = z.object({
       }
     }, 'Choose a valid locale'),
 });
+export const businessSettingsInput = organizationInput.omit({ slug: true });

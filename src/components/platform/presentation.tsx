@@ -24,7 +24,7 @@ export function StatusBadge({ status }: { status: string | null }) {
             : 'neutral'
       }
     >
-      {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Not recorded'}
+      {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Initialization pending'}
     </Badge>
   );
 }
@@ -40,7 +40,7 @@ export function PageHeading({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0 max-w-full">
         <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-primary">
           {eyebrow}
@@ -100,10 +100,19 @@ export function AuditList({ events }: { events: AuditRow[] }) {
       {events.map((event) => (
         <li key={event.id} className="flex items-start justify-between gap-3 px-5 py-2.5">
           <div className="min-w-0">
-            <p className="text-xs font-medium capitalize">{event.action.replace(/[._]/g, ' ')}</p>
+            <Link
+              href={`/platform/security/${event.id}`}
+              className="text-xs font-medium capitalize text-primary hover:underline"
+            >
+              {event.action.replace(/[._]/g, ' ')}
+            </Link>
             <p className="mt-1 truncate text-[11px] text-muted-foreground">
-              {event.source === 'organization' ? 'Organization event' : 'Identity event'} · Actor{' '}
-              {event.actorId.slice(-8) || 'not recorded'}
+              {event.source === 'organization'
+                ? 'Organization event'
+                : event.source === 'platform'
+                  ? 'Administrative event'
+                  : 'Identity event'}{' '}
+              · Actor {event.actorId.slice(-8) || 'not recorded'}
             </p>
           </div>
           <time

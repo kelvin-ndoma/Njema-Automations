@@ -2,8 +2,12 @@ import { beforeAll, afterAll, describe, it, expect, vi } from 'vitest';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { ObjectId } from 'mongodb';
 import { authClient } from '@/server/db';
-import { seedSuperAdmin, SUPER_ADMIN_EMAIL } from '@/modules/platform/repository';
-import { requireSuperAdmin } from '@/modules/platform/service';
+import {
+  grantPlatformAdmin,
+  seedSuperAdmin,
+  SUPER_ADMIN_EMAIL,
+} from '@/modules/platform/repository';
+import { requirePlatformOperator, requireSuperAdmin } from '@/modules/platform/service';
 import {
   getPlatformAudit,
   getPlatformOverview,
@@ -75,7 +79,7 @@ beforeAll(async () => {
     status: 'active',
     createdAt: new Date(),
   });
-  await seedSuperAdmin(db, authClient());
+  await seedSuperAdmin(db, authClient(), String(adminId));
 });
 afterAll(async () => {
   await authClient().close();
@@ -102,6 +106,15 @@ describe('Milestone 1 authorization boundaries', () => {
       .updateOne({ userId: String(ordinaryId) }, { $set: { role: 'owner' } });
     state.id = String(adminId);
     expect((await requireSuperAdmin()).id).toBe(String(adminId));
+  });
+  it('allows Platform Admin to read platform data but not use Super Admin gate', async () => {
+    const db = authClient().db('platform-test');
+    await grantPlatformAdmin(db, authClient(), String(adminId), String(ordinaryId));
+    state.id = String(ordinaryId);
+    expect((await requirePlatformOperator()).platformRole).toBe('platform-admin');
+    await expect(requireSuperAdmin()).rejects.toThrow('NOT_FOUND');
+    const overview = await getPlatformOverview({});
+    expect(overview.totalOrganizations).toBe(1);
   });
 });
 describe('Milestone 2 real data and projections', () => {

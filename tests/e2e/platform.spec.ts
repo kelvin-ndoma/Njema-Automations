@@ -51,7 +51,7 @@ test('super-admin overview, search, pagination, details, filters and mobile navi
   await page.getByRole('button', { name: 'Account menu' }).click();
   await page.getByRole('menuitem', { name: 'Platform control center' }).click();
   await expect(page.getByRole('heading', { name: 'Operations overview' })).toBeVisible();
-  await expect(page.getByText('Lifecycle status not recorded')).toBeVisible();
+  await expect(page.getByText('All registered businesses')).toBeVisible();
   await page.getByRole('button', { name: 'About platform metrics' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
@@ -162,4 +162,21 @@ test('authorized platform deep links survive authentication', async ({ page }) =
   await page.getByLabel('Password', { exact: true }).fill('development-test-password-123');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/platform\/users\?q=Development$/);
+});
+
+test('a platform administrator with viewer membership cannot edit the employee or run tenant test chat', async ({
+  page,
+}) => {
+  await login(page, 'kelvinndomamutua@gmail.com');
+  await page.goto('/app/development-business-18/employee');
+  await expect(page.getByRole('heading', { name: 'Your sales employee' })).toBeVisible();
+  await expect(page.getByLabel('Employee name', { exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save employee configuration' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Test employee', exact: true })).toHaveCount(0);
+  await page.goto('/app/development-business-18/settings');
+  await expect(page.getByLabel('Business name', { exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save business settings' })).toHaveCount(0);
+  await page.goto('/app/development-business-18/test-chat');
+  await expect(page.getByRole('heading', { name: 'Workspace unavailable.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ask employee' })).toHaveCount(0);
 });

@@ -55,7 +55,12 @@ export function SupportingPage({
                     'Available to authorized Super Admin',
                   ],
                   ['Demo inquiry submission', 'Available'],
-                  ['AI replies, business knowledge and employee configuration', 'Planned'],
+                  ['Employee configuration and approved text knowledge', 'Available foundation'],
+                  [
+                    'Private employee test replies',
+                    'Requires an OpenAI connection; owners/admins only',
+                  ],
+                  ['Website AI replies and embeddable chat', 'Planned'],
                   ['Lead capture, qualification and automated follow-ups', 'Planned'],
                   ['Messaging channel integrations and human handoff', 'Planned'],
                   ['Paid plans and billing', 'Not configured'],
@@ -79,9 +84,9 @@ export function SupportingPage({
               'Create an account, establish an organization and choose its locale, currency and time zone. Access follows active membership and organization permissions.',
             ],
             [
-              '02 / Planned',
+              '02 / Available foundation',
               'Configure your AI sales employee',
-              'Provide business knowledge and shape the conversations, priorities and escalation rules you want it to support. Employee configuration is not live yet.',
+              'An owner or administrator can save employee configuration, approved text knowledge and a fallback answer, then test standalone replies when an OpenAI connection is configured.',
             ],
             [
               '03 / Planned',

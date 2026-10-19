@@ -2,10 +2,28 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ZodError } from 'zod';
+import { revalidatePath } from 'next/cache';
 import { requireUser } from '@/server/session';
-import { createWorkspace, recordSwitch } from './service';
+import { createWorkspace, recordSwitch, saveBusinessSettings } from './service';
 export interface FormState {
   error?: string;
+  success?: boolean;
+}
+export async function updateSettings(
+  slug: string,
+  _state: FormState,
+  form: FormData,
+): Promise<FormState> {
+  const user = await requireUser();
+  try {
+    await saveBusinessSettings(user.id, slug, Object.fromEntries(form));
+  } catch (error) {
+    if (error instanceof ZodError)
+      return { error: error.issues[0]?.message ?? 'Check your entries.' };
+    return { error: 'Could not save settings. Check your access and try again.' };
+  }
+  revalidatePath(`/app/${slug}`, 'layout');
+  return { success: true };
 }
 export async function createOrganization(_state: FormState, form: FormData): Promise<FormState> {
   const user = await requireUser();

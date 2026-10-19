@@ -13,8 +13,13 @@ import { DataTable, EmptyState } from '@/components/platform/data-table';
 import { GrowthChart } from '@/components/platform/growth-chart';
 import { InfoDialog } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { getOperationalMetrics } from '@/modules/platform/operations-reporting';
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const data = await getPlatformOverview(await searchParams);
+  const params = await searchParams;
+  const [data, operations] = await Promise.all([
+    getPlatformOverview(params),
+    getOperationalMetrics(params),
+  ]);
   const metrics = [
     {
       label: 'Total organizations',
@@ -84,6 +89,74 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           </section>
         ))}
       </div>
+      <section
+        className="mb-5 overflow-hidden rounded-xl border border-input bg-white"
+        aria-label="Operational signals"
+      >
+        <div className="grid grid-cols-2 divide-input md:grid-cols-4 xl:grid-cols-8">
+          {(
+            [
+              ['Suspended organizations', operations.suspended],
+              ['Trial organizations', operations.trials],
+              ['Active subscriptions', operations.activeSubscriptions],
+              ['AI requests', operations.requests],
+              ['Reported AI tokens', operations.tokens],
+              ['Failed AI requests', operations.errors],
+              ['Open support requests', operations.openSupport],
+              ['Open incidents', operations.incidents],
+            ] as const
+          ).map(([label, value]) => (
+            <div key={label} className="border-r border-b border-input px-4 py-3">
+              <h2 className="text-xs text-muted-foreground">{label}</h2>
+              <p className="mt-2 text-xl font-semibold tabular-nums">{value}</p>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-wrap justify-between gap-3 px-4 py-3 text-xs text-muted-foreground">
+          <span>
+            AI period: {operations.days} UTC days · Estimated provider cost:{' '}
+            {operations.costMicroUsd === null
+              ? 'Unavailable — incomplete pricing records'
+              : `$${(operations.costMicroUsd / 1000000).toFixed(4)} USD`}
+          </span>
+          <span>MRR / payments: unavailable — billing provider not connected</span>
+        </div>
+      </section>
+      <section
+        className="mb-5 rounded-xl border border-input bg-[#f1f4ee] px-5 py-4"
+        aria-label="Operational alerts"
+      >
+        <h2 className="text-sm font-semibold">Operational attention</h2>
+        <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          {operations.untracked > 0 && (
+            <li>
+              <Link
+                href="/platform/organizations?status=untracked"
+                className="text-primary underline"
+              >
+                {operations.untracked} organizations need lifecycle initialization
+              </Link>
+            </li>
+          )}
+          {operations.pending > 0 && (
+            <li>
+              <Link href="/platform/ai" className="text-primary underline">
+                {operations.pending} AI requests await reconciliation
+              </Link>
+            </li>
+          )}
+          <li>
+            <Link href="/platform/support" className="text-primary underline">
+              {operations.openSupport} open support requests
+            </Link>
+          </li>
+          <li>
+            <Link href="/platform/health" className="text-primary underline">
+              Review system health and {operations.incidents} open incidents
+            </Link>
+          </li>
+        </ul>
+      </section>
       <div className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
         <Panel
           title="Organization growth"

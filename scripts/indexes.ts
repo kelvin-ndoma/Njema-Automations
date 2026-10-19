@@ -6,6 +6,16 @@ import {
   MutationLimit,
 } from '../src/modules/organizations/models';
 import { getEnv } from '../src/server/env';
+import { SalesEmployee } from '../src/modules/employees/models';
+import { createPlatformIndexes } from '../src/modules/platform/indexes';
+import { DailyAIUsage, TestConversationRecord } from '../src/modules/conversations/models';
+import {
+  QualifiedLead,
+  VisitorConversation,
+  VisitorRequest,
+  VisitorSession,
+  WidgetInstallation,
+} from '../src/modules/widget/models';
 async function main() {
   const db = await connectDb();
   try {
@@ -14,9 +24,18 @@ async function main() {
       Membership.createIndexes(),
       AuditEvent.createIndexes(),
       MutationLimit.createIndexes(),
+      SalesEmployee.createIndexes(),
+      DailyAIUsage.createIndexes(),
+      TestConversationRecord.createIndexes(),
+      WidgetInstallation.createIndexes(),
+      VisitorSession.createIndexes(),
+      VisitorConversation.createIndexes(),
+      VisitorRequest.createIndexes(),
+      QualifiedLead.createIndexes(),
     ]);
     const client = authClient();
     const authDb = client.db(getEnv().MONGODB_DB);
+    await createPlatformIndexes(authDb);
     await Promise.all([
       authDb.collection('user').createIndex({ email: 1 }, { unique: true }),
       authDb.collection('session').createIndex({ token: 1 }, { unique: true }),

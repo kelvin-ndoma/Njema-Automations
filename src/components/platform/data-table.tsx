@@ -107,7 +107,7 @@ export function DirectoryFilters({
           className="!h-10 !w-auto !min-w-36"
         >
           <option value="all">All statuses</option>
-          <option value="untracked">Not recorded</option>
+          <option value="untracked">Initialization pending</option>
           {supportedStatuses.map((s) => (
             <option value={s} key={s}>
               {s === 'active' ? 'Active' : 'Suspended'}

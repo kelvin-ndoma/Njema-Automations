@@ -14,15 +14,40 @@ const { connectDb } = await import('../src/server/db');
 const { Organization, Membership, AuditEvent, MutationLimit } =
   await import('../src/modules/organizations/models');
 await connectDb();
+const { SalesEmployee } = await import('../src/modules/employees/models');
+const { DailyAIUsage, TestConversationRecord } =
+  await import('../src/modules/conversations/models');
+const {
+  QualifiedLead,
+  VisitorConversation,
+  VisitorRequest,
+  VisitorSession,
+  WidgetInstallation,
+} = await import('../src/modules/widget/models');
+// Browser tests never call a real paid provider, even if local development has a key.
+delete process.env.OPENAI_API_KEY;
+delete process.env.OPENAI_MODEL;
+// Disposable synthetic replies for widget browser acceptance only.
+process.env.RELAY_SYNTHETIC_AI = '1';
 await Promise.all([
   Organization.createIndexes(),
   Membership.createIndexes(),
   AuditEvent.createIndexes(),
   MutationLimit.createIndexes(),
+  SalesEmployee.createIndexes(),
+  DailyAIUsage.createIndexes(),
+  TestConversationRecord.createIndexes(),
+  WidgetInstallation.createIndexes(),
+  VisitorSession.createIndexes(),
+  VisitorConversation.createIndexes(),
+  VisitorRequest.createIndexes(),
+  QualifiedLead.createIndexes(),
 ]);
 // Explicit development fixtures in a disposable database only.
 const { getAuth } = await import('../src/server/auth');
 const { authClient } = await import('../src/server/db');
+const { createPlatformIndexes } = await import('../src/modules/platform/indexes');
+await createPlatformIndexes(authClient().db('e2e'));
 const { seedSuperAdmin, SUPER_ADMIN_EMAIL } = await import('../src/modules/platform/repository');
 const admin = await getAuth().api.signUpEmail({
   body: {
@@ -38,7 +63,7 @@ const owner = await getAuth().api.signUpEmail({
     password: 'development-test-password-123',
   },
 });
-await seedSuperAdmin(authClient().db('e2e'), authClient());
+await seedSuperAdmin(authClient().db('e2e'), authClient(), admin.user.id);
 const fixtures = Array.from({ length: 18 }, (_, i) => ({
   name: `Development Business ${String(i + 1).padStart(2, '0')}`,
   slug: `development-business-${i + 1}`,

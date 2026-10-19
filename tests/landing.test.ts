@@ -19,6 +19,9 @@ describe('independent access scopes and landing policy', () => {
     expect(chooseLanding(true, ['a'], '/app/a')).toBe('/app/a');
     expect(chooseLanding(true, [], '/platform/users?q=kelvin')).toBe('/platform/users?q=kelvin');
     expect(chooseLanding(false, ['a'], '/account')).toBe('/account');
+    expect(chooseLanding(false, ['a'], '/app/a/employee')).toBe('/app/a/employee');
+    expect(chooseLanding(false, ['a'], '/app/a/settings')).toBe('/app/a/settings');
+    expect(chooseLanding(false, ['a'], '/app/private/employee')).toBe('/app/a');
   });
   it('rejects cross-tenant and revoked platform destinations', () => {
     expect(chooseLanding(true, ['a'], '/app/private')).toBe('/platform');

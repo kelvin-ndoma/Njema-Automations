@@ -2,15 +2,18 @@
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, UserRound } from 'lucide-react';
+import { LogOut, ShieldCheck, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 export function AccountMenu({
   name,
   platformAccess = false,
+  context = 'app',
 }: {
   name: string;
   platformAccess?: boolean;
+  /** When opened from the platform shell, keep navigation inside platform routes. */
+  context?: 'app' | 'platform';
 }) {
   const router = useRouter();
   const [error, setError] = useState('');
@@ -19,7 +22,6 @@ export function AccountMenu({
       const result = await authClient.signOut();
       if (result.error) throw new Error();
       router.replace('/sign-in');
-      router.refresh();
     } catch {
       setError('Could not sign out. Please try again.');
     }
@@ -43,19 +45,29 @@ export function AccountMenu({
             <Dropdown.Separator className="my-1 h-px bg-input" />
             <Dropdown.Item asChild>
               <Link
-                href="/account"
+                href={context === 'platform' ? '/platform/account' : '/account'}
                 className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm outline-none focus:bg-muted"
               >
                 <UserRound size={15} /> Account
               </Link>
             </Dropdown.Item>
-            {platformAccess && (
+            {platformAccess && context !== 'platform' && (
               <Dropdown.Item asChild>
                 <Link
                   href="/platform"
                   className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm outline-none focus:bg-muted"
                 >
-                  <UserRound size={15} /> Platform control center
+                  <ShieldCheck size={15} /> Platform control center
+                </Link>
+              </Dropdown.Item>
+            )}
+            {context === 'platform' && (
+              <Dropdown.Item asChild>
+                <Link
+                  href="/organizations"
+                  className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm outline-none focus:bg-muted"
+                >
+                  <UserRound size={15} /> My organization workspaces
                 </Link>
               </Dropdown.Item>
             )}

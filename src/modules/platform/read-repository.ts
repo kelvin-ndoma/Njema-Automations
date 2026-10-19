@@ -2,7 +2,7 @@ import 'server-only';
 import { ObjectId, type Db, type Document, type Filter } from 'mongodb';
 import { authClient } from '@/server/db';
 import { getEnv } from '@/server/env';
-import { requireSuperAdmin } from './service';
+import { requirePlatformOperator } from './service';
 import { directoryInput, escapedSearch, platformId, reportDays, type SearchParams } from './input';
 import type {
   Identity,
@@ -14,7 +14,7 @@ import type {
 } from './types';
 // Every exported read authorizes afresh. These repositories return explicit DTOs only.
 async function authorizedDb(): Promise<Db> {
-  await requireSuperAdmin();
+  await requirePlatformOperator();
   return authClient().db(getEnv().MONGODB_DB);
 }
 const date = (v: unknown) => (v instanceof Date && !isNaN(v.getTime()) ? v.toISOString() : null);
@@ -102,6 +102,24 @@ async function activity(db: Db, organizationId?: ObjectId, limit = 8): Promise<A
         ],
       },
     });
+  orgPipeline.push({
+    $unionWith: {
+      coll: 'platformAudit',
+      pipeline: [
+        ...(organizationId ? [{ $match: { organizationId } }] : []),
+        {
+          $project: {
+            _id: 1,
+            action: 1,
+            actorId: 1,
+            organizationId: 1,
+            createdAt: 1,
+            source: { $literal: 'platform' },
+          },
+        },
+      ],
+    },
+  });
   const rows = await db
     .collection('auditevents')
     .aggregate([...orgPipeline, { $sort: { createdAt: -1, _id: -1 } }, { $limit: limit }])
@@ -150,7 +168,7 @@ export async function getPlatformOverview(params: SearchParams): Promise<Overvie
     statusRecorded,
     active,
     trend,
-    newest,
+    newestRows,
     events,
   ] = await Promise.all([
     db.collection('organizations').countDocuments(),
@@ -175,7 +193,8 @@ export async function getPlatformOverview(params: SearchParams): Promise<Overvie
       .find({}, { projection: orgProjection() })
       .sort({ createdAt: -1, _id: -1 })
       .limit(3)
-      .toArray(),
+      .toArray()
+      .then((rows) => organizationRows(db, rows)),
     activity(db, undefined, 5),
   ]);
   const counts = new Map(trend.map((t) => [t._id, t.count]));
@@ -192,7 +211,7 @@ export async function getPlatformOverview(params: SearchParams): Promise<Overvie
       const day = new Date(from.getTime() + i * 86400000).toISOString().slice(0, 10);
       return { date: day, count: counts.get(day) ?? 0 };
     }),
-    newest: await organizationRows(db, newest),
+    newest: newestRows,
     activity: events,
   };
 }
@@ -211,12 +230,42 @@ export async function getPlatformOrganizations(params: SearchParams) {
   const result = await paginated(db, 'organizations', filter, input, orgProjection(), (rows) =>
     organizationRows(db, rows),
   );
-  const statuses = await db.collection('organizations').distinct('status');
+  const organizationIds = result.rows.map((row) => new ObjectId(row.id));
+  const [memberships, employees, subscriptions] = await Promise.all([
+    db
+      .collection('memberships')
+      .aggregate([
+        { $match: { organizationId: { $in: organizationIds }, status: 'active' } },
+        { $group: { _id: '$organizationId', count: { $sum: 1 } } },
+      ])
+      .toArray(),
+    db
+      .collection('salesemployees')
+      .aggregate([
+        { $match: { organizationId: { $in: organizationIds } } },
+        { $group: { _id: '$organizationId', count: { $sum: 1 } } },
+      ])
+      .toArray(),
+    db
+      .collection('organizationSubscriptions')
+      .find(
+        { organizationId: { $in: organizationIds } },
+        { projection: { organizationId: 1, state: 1 } },
+      )
+      .toArray(),
+  ]);
   return {
     ...result,
+    rows: result.rows.map((row) => ({
+      ...row,
+      memberCount: Number(memberships.find((item) => String(item._id) === row.id)?.count ?? 0),
+      employeeCount: Number(employees.find((item) => String(item._id) === row.id)?.count ?? 0),
+      subscriptionState: subscriptions.find((item) => String(item.organizationId) === row.id)
+        ?.state as string | undefined,
+    })),
     q: input.q,
     status: input.status,
-    supportedStatuses: statuses.filter((s): s is string => s === 'active' || s === 'suspended'),
+    supportedStatuses: ['active', 'suspended'],
   };
 }
 async function membershipRows(db: Db, rows: Document[]): Promise<MembershipRow[]> {
@@ -353,6 +402,44 @@ export async function getPlatformAudit(params: SearchParams) {
         ],
       },
     },
+    {
+      $unionWith: {
+        coll: 'platformAudit',
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              action: 1,
+              actorId: 1,
+              organizationId: 1,
+              createdAt: 1,
+              source: { $literal: 'platform' },
+            },
+          },
+        ],
+      },
+    },
+    ...(() => {
+      const filter: Document = {};
+      const org = typeof params.organization === 'string' ? params.organization : '';
+      const actor = typeof params.actor === 'string' ? params.actor : '';
+      if (platformId.safeParse(org).success) filter.organizationId = new ObjectId(org);
+      if (actor && actor.length <= 100) filter.actorId = actor;
+      const from =
+        typeof params.from === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(params.from)
+          ? new Date(params.from + 'T00:00:00Z')
+          : null;
+      const to =
+        typeof params.to === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(params.to)
+          ? new Date(params.to + 'T23:59:59.999Z')
+          : null;
+      if ((from && !isNaN(from.getTime())) || (to && !isNaN(to.getTime())))
+        filter.createdAt = {
+          ...(from && !isNaN(from.getTime()) ? { $gte: from } : {}),
+          ...(to && !isNaN(to.getTime()) ? { $lte: to } : {}),
+        };
+      return Object.keys(filter).length ? [{ $match: filter }] : [];
+    })(),
     ...(input.q ? [{ $match: { action: { $regex: escapedSearch(input.q), $options: 'i' } } }] : []),
   ];
   const counts = await db

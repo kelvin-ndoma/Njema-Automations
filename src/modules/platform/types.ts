@@ -33,7 +33,7 @@ export interface AuditRow {
   actorId: string;
   organizationId: string | null;
   createdAt: string | null;
-  source: 'identity' | 'organization';
+  source: 'identity' | 'organization' | 'platform';
 }
 export interface PageResult<T> {
   rows: T[];

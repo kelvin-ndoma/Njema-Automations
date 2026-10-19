@@ -75,6 +75,32 @@ describe('authentication and tenant integration', () => {
     const session = await authRequest('get-session', undefined, cookie);
     expect((await session.json()).user.id).toBe(userId);
   });
+  it('blocks restricted accounts from new and existing sessions while preserving credentials', async () => {
+    const database = authClient().db('test');
+    const controls = database.collection('userControls');
+    const count = await database.collection('session').countDocuments({ userId });
+    await controls.insertOne({ userId, restricted: true });
+    const denied = await authRequest('sign-in/email', {
+      email: 'owner@example.test',
+      password: 'secure-test-password-123',
+    });
+    expect(denied.status).toBe(403);
+    expect((await denied.json()).code).toBe('ACCOUNT_RESTRICTED');
+    expect(await database.collection('session').countDocuments({ userId })).toBe(count);
+    const existing = await handleAuth(
+      new Request('http://localhost:3000/api/auth/get-session', {
+        headers: { Cookie: cookie },
+      }),
+    );
+    expect(existing.status).toBe(403);
+    await controls.updateOne({ userId }, { $set: { restricted: false } });
+    const restored = await authRequest('sign-in/email', {
+      email: 'owner@example.test',
+      password: 'secure-test-password-123',
+    });
+    expect(restored.status).toBe(200);
+    expect((await restored.json()).user.id).toBe(userId);
+  });
   it('rejects invalid credentials and unauthenticated sessions', async () => {
     const response = await authRequest('sign-in/email', {
       email: 'owner@example.test',

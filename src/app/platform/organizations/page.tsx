@@ -9,6 +9,8 @@ import {
   DetailLink,
 } from '@/components/platform/presentation';
 import { DirectoryFilters, DataTable, Pagination } from '@/components/platform/data-table';
+import { OperationForm } from '@/components/platform/operation-form';
+import { Field, Reason } from '@/components/platform/fields';
 export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const result = await getPlatformOrganizations(await searchParams);
   return (
@@ -39,15 +41,25 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
               key: 'name',
               title: 'Organization',
               render: (o) => (
-                <Link
-                  href={`/platform/organizations/${o.id}`}
-                  className="font-medium hover:text-primary"
-                >
-                  {o.name}
+                <div>
+                  <Link
+                    href={`/platform/organizations/${o.id}`}
+                    className="font-medium hover:text-primary"
+                  >
+                    {o.name}
+                  </Link>
                   <span className="mt-1 block text-xs font-normal text-muted-foreground">
                     /{o.slug}
                   </span>
-                </Link>
+                  <div className="mt-2 flex flex-wrap gap-3 text-xs">
+                    <Link href={`/platform/organizations/${o.id}`} className="text-primary underline">
+                      Admin profile
+                    </Link>
+                    <Link href={`/app/${o.slug}`} className="text-primary underline">
+                      Customer workspace
+                    </Link>
+                  </div>
+                </div>
               ),
             },
             {
@@ -77,6 +89,21 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
             },
             { key: 'status', title: 'Status', render: (o) => <StatusBadge status={o.status} /> },
             {
+              key: 'team',
+              title: 'Active team',
+              render: (o) => <span className="text-xs tabular-nums">{o.memberCount}</span>,
+            },
+            {
+              key: 'employees',
+              title: 'Employees',
+              render: (o) => <span className="text-xs tabular-nums">{o.employeeCount}</span>,
+            },
+            {
+              key: 'subscription',
+              title: 'Subscription',
+              render: (o) => <span className="text-xs">{o.subscriptionState || 'Unassigned'}</span>,
+            },
+            {
               key: 'created',
               title: 'Created · UTC',
               render: (o) => (
@@ -89,7 +116,24 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
               key: 'view',
               title: 'Details',
               render: (o) => (
-                <DetailLink href={`/platform/organizations/${o.id}`} label={`View ${o.name}`} />
+                <div className="flex items-center gap-3">
+                  <DetailLink href={`/platform/organizations/${o.id}`} label={`View ${o.name}`} />
+                  <OperationForm
+                    operation="organization.state"
+                    hidden={{
+                      organizationId: o.id,
+                      status:
+                        o.status === 'suspended' ? 'active' : o.status ? 'suspended' : 'active',
+                    }}
+                    label={
+                      o.status === 'suspended' ? 'Reactivate' : o.status ? 'Suspend' : 'Initialize'
+                    }
+                    sensitive
+                  >
+                    <Field name="confirmation" label={`Type organization address: ${o.slug}`} />
+                    <Reason />
+                  </OperationForm>
+                </div>
               ),
             },
           ]}

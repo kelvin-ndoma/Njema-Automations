@@ -18,9 +18,18 @@ Use npm. Commands invoke the project-local Node 22.23.3 runtime.
 
 ## Implementation standards
 
-Phase 1 foundation plus approved platform Milestones 1–2 only. No organization
-suspension, additional administrators, or later modules. The public marketing site
-and access hierarchy correction are also explicitly approved.
+The user approved the full Relay product scope on 12 October 2026. Follow the
+executable milestones and verification status in `docs/product-build.md`; preserve
+`docs/roadmap.md` as historical context. Implement later modules within that scope,
+including organization lifecycle and explicit audited Support Mode. Kelvin
+(`kelvinndomamutua@gmail.com`) is the sole Super Admin and owner of the whole
+platform — encoded as `SUPER_ADMIN_EMAIL` in `src/modules/platform/repository.ts`.
+Do not transfer, replace, or dilute that ownership without an explicit user request.
+Opening `/app/[orgSlug]` as Super Admin or Platform Admin auto-enters audited
+read-only Support Mode when they are not a member — never an implicit write bypass.
+The platform has one Super Admin plus optional Platform Admin grants that only the
+Super Admin may issue. Platform Admins may use audited Support Mode; they cannot grant
+platform roles or change privileged platform settings.
 Strict TypeScript, Zod validation, App Router, Tailwind and shadcn-style local primitives.
 Keep server-only repositories and domain services separate. Route handlers and Server
 Actions only adapt transport, authenticate, and invoke services. Do not put domain

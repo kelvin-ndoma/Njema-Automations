@@ -12,9 +12,15 @@ export default async function Page() {
         <Brand />
         <AccountMenu name={user.name} platformAccess={platformAccess} />
       </div>
-      <Link href="/organizations" className="mt-8 block text-sm text-primary">
-        ← Workspaces
-      </Link>
+      {platformAccess ? (
+        <Link href="/platform" className="mt-8 block text-sm text-primary">
+          ← Platform control center
+        </Link>
+      ) : (
+        <Link href="/organizations" className="mt-8 block text-sm text-primary">
+          ← Workspaces
+        </Link>
+      )}
       <h1 className="mt-6 text-3xl font-semibold">Your account</h1>
       <dl className="mt-6 space-y-4 rounded-xl border border-input p-6 text-sm">
         <div>

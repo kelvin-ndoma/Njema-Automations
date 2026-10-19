@@ -12,8 +12,12 @@ export function safeDestination(value?: string): string | null {
   if (url.origin !== 'https://local.invalid') return null;
   const path = url.pathname;
   if (
-    /^\/platform(?:\/(?:organizations|users)(?:\/[a-fA-F0-9]{24})?|\/security)?$/.test(path) ||
-    /^\/app\/[a-z0-9-]+$/.test(path) ||
+    /^\/platform(?:\/(?:organizations|users)(?:\/[a-fA-F0-9]{24})?|\/security(?:\/(?:identity|organization|platform):[a-fA-F0-9]{24})?|\/(?:billing|ai|health|settings|account|operators)|\/support(?:\/(?:access\/)?[a-fA-F0-9]{24})?)?$/.test(
+      path,
+    ) ||
+    /^\/app\/[a-z0-9-]+(?:\/(?:employee|settings|test-chat|widget(?:\/preview)?|inbox))?$/.test(
+      path,
+    ) ||
     ['/account', '/organizations', '/organizations/new'].includes(path)
   )
     return path + url.search + url.hash;
@@ -32,7 +36,7 @@ export function chooseLanding(
       path.startsWith('/platform')
         ? platform
         : path.startsWith('/app/')
-          ? slugs.includes(path.slice(5))
+          ? slugs.includes(path.split('/')[2])
           : true
     )
       return destination;

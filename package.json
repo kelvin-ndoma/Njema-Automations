@@ -10,8 +10,10 @@
     "test": "node_modules/node/bin/node node_modules/vitest/vitest.mjs run",
     "test:e2e": "node_modules/node/bin/node node_modules/@playwright/test/cli.js test",
     "db:indexes": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/indexes.ts",
+    "auth:check": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/check-auth.ts",
     "format": "node_modules/node/bin/node node_modules/prettier/bin/prettier.cjs --write .",
     "seed:super-admin": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/seed-super-admin.ts",
+    "seed:demo": "node_modules/node/bin/node --conditions=react-server --env-file=.env --import tsx scripts/seed-demo-organizations.ts",
     "build:e2e": "NEXT_BUILD_DIR=.next-platform-tests npm run build",
     "predev": "node_modules/node/bin/node scripts/fix-dev-performance.mjs"
   },

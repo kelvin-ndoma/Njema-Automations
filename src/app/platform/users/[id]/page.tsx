@@ -7,6 +7,7 @@ import { PageHeading, Panel, formatDate, ProfileFields } from '@/components/plat
 import { Pagination } from '@/components/platform/data-table';
 import { MembershipTable } from '@/components/platform/membership-table';
 import { Badge } from '@/components/ui/badge';
+import { UserOperations } from '@/components/platform/user-operations';
 export default async function Page({
   params,
   searchParams,
@@ -69,6 +70,7 @@ export default async function Page({
           <Pagination result={data.memberships} path={`/platform/users/${user.id}`} />
         </Panel>
       </div>
+      <UserOperations id={user.id} email={user.email} superAdmin={data.superAdmin} />
     </>
   );
 }

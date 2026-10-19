@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ArrowRight, LoaderCircle } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { safeDestination } from '@/server/landing-policy';
 import { authErrorMessage } from '@/lib/auth-error';
@@ -24,6 +24,7 @@ export function AuthForm({ signup = false, next }: { signup?: boolean; next?: st
     () => false,
   );
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -43,14 +44,14 @@ export function AuthForm({ signup = false, next }: { signup?: boolean; next?: st
         ? await authClient.signUp.email(values)
         : await authClient.signIn.email({ email: values.email, password: values.password });
       if (result.error) {
-        setError(authErrorMessage(result.error.status, signup));
+        setError(authErrorMessage(result.error.status, signup, result.error.code));
         return;
       }
       const destination = safeDestination(next);
+      // Replace only — refresh() re-ran /auth/continue and doubled the post-login wait.
       router.replace(
         '/auth/continue' + (destination ? '?next=' + encodeURIComponent(destination) : ''),
       );
-      router.refresh();
     } catch {
       setError('Unable to connect. Please try again.');
     }
@@ -82,13 +83,25 @@ export function AuthForm({ signup = false, next }: { signup?: boolean; next?: st
         <label htmlFor="password" className="mb-2 block text-sm font-medium">
           Password
         </label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete={signup ? 'new-password' : 'current-password'}
-          {...register('password')}
-          aria-invalid={!!errors.password}
-        />
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            autoComplete={signup ? 'new-password' : 'current-password'}
+            className="pr-11"
+            {...register('password')}
+            aria-invalid={!!errors.password}
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted-foreground hover:text-foreground"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((visible) => !visible)}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
         {errors.password && <p className="mt-1 text-sm text-red-700">{errors.password.message}</p>}
         {signup && (
           <p className="mt-2 text-xs text-muted-foreground">

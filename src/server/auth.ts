@@ -4,6 +4,7 @@ import { mongodbAdapter } from '@better-auth/mongo-adapter';
 import { getEnv } from './env';
 import { authClient } from './db';
 import { authOrigins } from '@/lib/auth-origins';
+import { APIError } from 'better-auth/api';
 function buildAuth() {
   const env = getEnv();
   const client = authClient();
@@ -32,6 +33,18 @@ function buildAuth() {
       },
       session: {
         create: {
+          before: async (session) => {
+            if (
+              await client
+                .db(env.MONGODB_DB)
+                .collection('userControls')
+                .findOne({ userId: session.userId, restricted: true }, { projection: { _id: 1 } })
+            )
+              throw new APIError('FORBIDDEN', {
+                code: 'ACCOUNT_RESTRICTED',
+                message: 'This account is restricted. Contact support.',
+              });
+          },
           after: async (session) => {
             await client.db(env.MONGODB_DB).collection('identityAudit').insertOne({
               actorId: session.userId,
